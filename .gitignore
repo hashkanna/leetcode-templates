@@ -1,0 +1,13 @@
+build/
+texcache/
+**/_minted-*/
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.toc
+*.pyg
+*.synctex.gz
+# Scratch experiments can stay local
+scratch/

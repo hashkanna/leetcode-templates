@@ -1,0 +1,481 @@
+% Heap-Focused LeetCode Templates
+\documentclass[12pt]{article}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{fontspec}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{enumitem}
+\usepackage[outputdir=build/heaps]{minted}
+\usepackage{needspace}
+\usepackage{emoji}
+
+\setmainfont{Times New Roman}
+\setmonofont{Menlo}
+
+\definecolor{HeapOlive}{HTML}{556B2F}
+\definecolor{SelectionGold}{HTML}{B8860B}
+\definecolor{StreamBlue}{HTML}{1E90FF}
+\definecolor{SchedulePurple}{HTML}{7B68EE}
+\definecolor{BestFirstTeal}{HTML}{008080}
+\definecolor{codebg}{HTML}{F6F8FA}
+
+\titleformat{\section}{\Large\bfseries}{\thesection}{1em}{}
+\titlespacing*{\section}{0pt}{*4}{*2}
+\titlespacing*{\subsection}{0pt}{*2}{*1}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=Black,
+  urlcolor=MidnightBlue,
+  citecolor=Black,
+  pdfauthor={Heap Patterns Playbook},
+  pdftitle={Heap Patterns Playbook},
+  pdfcreator={LaTeX with minted}
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancypagestyle{plain}{\fancyhf{}}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5em}
+\setlist[itemize]{nosep,left=0pt}
+\setstretch{1.05}
+
+\setminted{
+  bgcolor=codebg,
+  fontsize=\footnotesize,
+  breaklines=true,
+  breakanywhere=false,
+  autogobble=true,
+  linenos=false,
+  samepage=true
+}
+
+\makeatletter
+\newif\if@firstsection
+\@firstsectiontrue
+\pretocmd{\section}{\if@firstsection\global\@firstsectionfalse\else\clearpage\fi}{}{}
+\newcommand{\prepare@subsection}{\needspace{20\baselineskip}}
+\pretocmd{\subsection}{\prepare@subsection}{}{}
+\makeatother
+
+\newcommand{\coloredsection}[3]{%
+  \section{\texorpdfstring{{\color{#2}\emoji{#1}\ #3}}{#3}}
+}
+\pdfstringdefDisableCommands{\def\emoji#1{}}
+
+\newcommand{\examplelist}[1]{%
+  \textbf{Example Problems:}
+  \begin{itemize}
+    #1
+  \end{itemize}
+}
+
+\begin{document}
+
+\begin{titlepage}
+  \centering
+  {\Huge Heap Patterns Playbook \\[1em]}
+  {\Large High-Impact Priority Queue Templates \\[2em]}
+  {\large Updated \today \\[3em]}
+  {\large Curated from Blind 75, NeetCode 150, and top company sets}
+\end{titlepage}
+
+\thispagestyle{empty}
+\tableofcontents
+\newpage
+
+\coloredsection{herb}{HeapOlive}{Heap Fundamentals}
+Master min-heaps, simulate max-heaps, and keep comparison keys tidy to spin up solution scaffolds quickly.
+
+\subsection{Min-Heap Quick Reference}
+Python's `heapq` is a binary min-heap. Build helpers for clarity.
+\textbf{Complexity:} Push/pop $O(\log n)$, peek $O(1)$.
+\begin{minted}{python}
+import heapq
+
+class MinHeap:
+    def __init__(self, data=None):
+        self.heap = list(data or [])
+        heapq.heapify(self.heap)
+
+    def push(self, val):
+        heapq.heappush(self.heap, val)
+
+    def pop(self):
+        return heapq.heappop(self.heap)
+
+    def peek(self):
+        return self.heap[0]
+
+    def __len__(self):
+        return len(self.heap)
+\end{minted}
+\examplelist{
+  \item 703. Kth Largest Element in a Stream (Blind 75)
+  \item 973. K Closest Points to Origin (NeetCode 150)
+  \item 1046. Last Stone Weight (NeetCode 150 variant)
+  \item 1130. Minimum Cost Tree From Leaf Values (Top Amazon)
+}
+
+\subsection{Max-Heap Simulation}
+Negate values or wrap tuples to flip ordering.
+\begin{minted}{python}
+import heapq
+
+class MaxHeap:
+    def __init__(self, data=None):
+        self.heap = [(-val, val) for val in (data or [])]
+        heapq.heapify(self.heap)
+
+    def push(self, val):
+        heapq.heappush(self.heap, (-val, val))
+
+    def pop(self):
+        return heapq.heappop(self.heap)[1]
+\end{minted}
+\examplelist{
+  \item 215. Kth Largest Element in an Array (Blind 75)
+  \item 621. Task Scheduler (Top Amazon)
+  \item 767. Reorganize String (Top Google)
+  \item 264. Ugly Number II (Top Meta)
+}
+
+\subsection{Heapify from Iterable}
+`heapq.heapify` in-place: linear-time build makes repeated pushes cheaper.
+\begin{minted}{python}
+import heapq
+
+def heapify_array(nums):
+    heapq.heapify(nums)
+    return nums
+\end{minted}
+\examplelist{
+  \item 347. Top K Frequent Elements (Blind 75, NeetCode 150)
+  \item 692. Top K Frequent Words (NeetCode 150)
+  \item 502. IPO (Top Google)
+  \item 218. The Skyline Problem (Top Amazon)
+}
+
+\coloredsection{gem-stone}{SelectionGold}{Selection Patterns}
+Use heaps to isolate the smallest or largest $k$ elements, or to rank items by custom scores.
+
+\subsection{Kth Element (Quickselect Backup)}
+Maintain a bounded heap for predictable $O(n \log k)$ when input is adversarial.
+\begin{minted}{python}
+import heapq
+
+def kth_largest(nums, k):
+    heap = nums[:k]
+    heapq.heapify(heap)
+    for num in nums[k:]:
+        if num > heap[0]:
+            heapq.heapreplace(heap, num)
+    return heap[0]
+\end{minted}
+\examplelist{
+  \item 215. Kth Largest Element in an Array (Blind 75)
+  \item 973. K Closest Points to Origin (NeetCode 150)
+  \item 787. Cheapest Flights Within K Stops (Top Amazon)
+  \item 719. Find K-th Smallest Pair Distance (Top Google)
+}
+
+\subsection{Top-K by Frequency}
+Push frequency pairs; break ties lexicographically when needed.
+\begin{minted}{python}
+import heapq
+from collections import Counter
+
+def top_k_frequent(nums, k):
+    counter = Counter(nums)
+    heap = [(-freq, val) for val, freq in counter.items()]
+    heapq.heapify(heap)
+    return [heapq.heappop(heap)[1] for _ in range(k)]
+\end{minted}
+\examplelist{
+  \item 347. Top K Frequent Elements (Blind 75)
+  \item 692. Top K Frequent Words (NeetCode 150)
+  \item 451. Sort Characters By Frequency (NeetCode 150)
+  \item 358. Rearrange String k Distance Apart (Top Amazon)
+}
+
+\subsection{K-Way Merge of Sorted Sources}
+Keep next candidate from each list; add the successor after popping.
+\begin{minted}{python}
+import heapq
+
+# ListNode definition provided by the online judge
+def merge_k_lists(lists):
+    heap = []
+    for idx, head in enumerate(lists):
+        if head:
+            heapq.heappush(heap, (head.val, idx, head))
+
+    dummy = tail = ListNode(0)
+    while heap:
+        _, idx, node = heapq.heappop(heap)
+        tail.next = node
+        tail = tail.next
+        if node.next:
+            heapq.heappush(heap, (node.next.val, idx, node.next))
+    return dummy.next
+\end{minted}
+\examplelist{
+  \item 23. Merge k Sorted Lists (Blind 75)
+  \item 373. Find K Pairs with Smallest Sums (NeetCode 150)
+  \item 632. Smallest Range Covering Elements from K Lists (Top Google)
+  \item 378. Kth Smallest Element in a Sorted Matrix (NeetCode 150)
+}
+
+\coloredsection{droplet}{StreamBlue}{Streaming \& Sliding Window}
+Two-heaps and lazy deletion keep order statistics online as streams evolve.
+
+\subsection{Running Median with Two Heaps}
+Balance max-heap (lower half) and min-heap (upper half).
+\begin{minted}{python}
+import heapq
+
+class MedianStream:
+    def __init__(self):
+        self.low = []   # max-heap via negatives
+        self.high = []  # min-heap
+
+    def add(self, num):
+        heapq.heappush(self.low, -num)
+        if self.low and self.high and -self.low[0] > self.high[0]:
+            heapq.heappush(self.high, -heapq.heappop(self.low))
+        if len(self.low) > len(self.high) + 1:
+            heapq.heappush(self.high, -heapq.heappop(self.low))
+        if len(self.high) > len(self.low):
+            heapq.heappush(self.low, -heapq.heappop(self.high))
+
+    def median(self):
+        if len(self.low) > len(self.high):
+            return float(-self.low[0])
+        return (-self.low[0] + self.high[0]) / 2
+\end{minted}
+\examplelist{
+  \item 295. Find Median from Data Stream (Blind 75)
+  \item 480. Sliding Window Median (Hard, NeetCode 150)
+  \item 2208. Minimum Operations to Halve Array Sum (Top Amazon)
+  \item 502. IPO (variant balancing profits)
+}
+
+\subsection{Kth Largest in Stream}
+Keep a size-$k$ min-heap; pop when exceeding capacity.
+\begin{minted}{python}
+import heapq
+
+class KthLargest:
+    def __init__(self, k, nums):
+        self.k = k
+        self.heap = nums
+        heapq.heapify(self.heap)
+        while len(self.heap) > k:
+            heapq.heappop(self.heap)
+
+    def add(self, val):
+        if len(self.heap) < self.k:
+            heapq.heappush(self.heap, val)
+        elif val > self.heap[0]:
+            heapq.heapreplace(self.heap, val)
+        return self.heap[0]
+\end{minted}
+\examplelist{
+  \item 703. Kth Largest Element in a Stream (Blind 75)
+  \item 1046. Last Stone Weight (NeetCode 150)
+  \item 215. Kth Largest Element in an Array (stream variant)
+  \item 871. Minimum Number of Refueling Stops (Top Google)
+}
+
+\subsection{Sliding Window Maximum via Lazy Deletion}
+Use max-heap storing `(-value, index)` and drop stale entries when they fall outside the window.
+\begin{minted}{python}
+import heapq
+
+def max_sliding_window(nums, k):
+    heap, result = [], []
+    for i, val in enumerate(nums):
+        heapq.heappush(heap, (-val, i))
+        if i >= k - 1:
+            while heap and heap[0][1] <= i - k:
+                heapq.heappop(heap)
+            result.append(-heap[0][0])
+    return result
+\end{minted}
+\examplelist{
+  \item 239. Sliding Window Maximum (Blind 75)
+  \item 480. Sliding Window Median (NeetCode 150)
+  \item 1438. Longest Continuous Subarray With Absolute Diff \(\leq\) Limit (Top Amazon)
+  \item 295. Find Median from Data Stream (support routine)
+}
+
+\coloredsection{alarm-clock}{SchedulePurple}{Scheduling \& Greedy Decisions}
+Heaps prioritize upcoming work, track capacity, and optimize reward accumulation.
+
+\subsection{Interval Room Count}
+Sort starts; push end times to count concurrent meetings.
+\begin{minted}{python}
+import heapq
+
+def min_meeting_rooms(intervals):
+    intervals.sort()
+    heap = []
+    for start, end in intervals:
+        if heap and heap[0] <= start:
+            heapq.heapreplace(heap, end)
+        else:
+            heapq.heappush(heap, end)
+    return len(heap)
+\end{minted}
+\examplelist{
+  \item 253. Meeting Rooms II (NeetCode 150)
+  \item 1851. Minimum Interval to Include Each Query (Top Google)
+  \item 1094. Car Pooling (Top Amazon)
+  \item 1353. Maximum Number of Events That Can Be Attended (Top Facebook)
+}
+
+\subsection{Greedy Pick with Profit and Capital}
+Two heaps: one for available projects by profit, one for locked projects by capital.
+\begin{minted}{python}
+import heapq
+
+def find_maximized_capital(k, w, profits, capital):
+    projects = sorted(zip(capital, profits))
+    available, idx = [], 0
+    for _ in range(k):
+        while idx < len(projects) and projects[idx][0] <= w:
+            heapq.heappush(available, -projects[idx][1])
+            idx += 1
+        if not available:
+            break
+        w -= heapq.heappop(available)
+    return w
+\end{minted}
+\examplelist{
+  \item 502. IPO (NeetCode 150)
+  \item 630. Course Schedule III (Top Google)
+  \item 857. Minimum Cost to Hire K Workers (Top Amazon)
+  \item 2542. Maximum Subsequence Score (Top Amazon)
+}
+
+\subsection{Median Cost Scheduling}
+Track both halves to adjust costs as tasks arrive.
+\begin{minted}{python}
+import heapq
+
+def min_total_distance(positions):
+    left, right = [], []
+    median = positions[0]
+    cost = 0
+    for pos in positions:
+        if pos <= median:
+            heapq.heappush(left, -pos)
+        else:
+            heapq.heappush(right, pos)
+        # rebalance
+        if len(left) > len(right) + 1:
+            heapq.heappush(right, -heapq.heappop(left))
+        if len(right) > len(left):
+            heapq.heappush(left, -heapq.heappop(right))
+        median = -left[0]
+        cost += abs(pos - median)
+    return cost
+\end{minted}
+\examplelist{
+  \item 846. Hand of Straights (NeetCode 150 helper)
+  \item 1705. Maximum Number of Eaten Apples (Top Apple)
+  \item 1882. Process Tasks Using Servers (Top Amazon)
+  \item 2402. Meeting Rooms III (Top Meta)
+}
+
+\coloredsection{compass}{BestFirstTeal}{Best-First Search}
+Heaps drive best-first traversal when you always expand the most promising state next.
+
+\subsection{Weighted Grid Path (Dijkstra Variant)}
+Standard template; tweak scoring function for probability or minimax goals.
+\begin{minted}{python}
+import heapq
+
+def best_first(grid):
+    rows, cols = len(grid), len(grid[0])
+    heap = [(grid[0][0], 0, 0)]
+    dist = {(0, 0): grid[0][0]}
+    while heap:
+        cost, r, c = heapq.heappop(heap)
+        if (r, c) == (rows - 1, cols - 1):
+            return cost
+        for dr, dc in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < rows and 0 <= nc < cols:
+                new_cost = cost + grid[nr][nc]
+                if new_cost < dist.get((nr, nc), float('inf')):
+                    dist[(nr, nc)] = new_cost
+                    heapq.heappush(heap, (new_cost, nr, nc))
+\end{minted}
+\examplelist{
+  \item 1631. Path With Minimum Effort (Blind 75)
+  \item 1514. Path With Maximum Probability (NeetCode 150 – flip to max-heap)
+  \item 505. The Maze II (Top Google)
+  \item 778. Swim in Rising Water (Blind 75)
+}
+
+\subsection{Best-First Search with Heuristic Key}
+Push \texttt{(priority, state\_id, state)} to encode tie-breakers.
+\begin{minted}{python}
+import heapq
+import itertools
+
+def a_star(start_state, heuristic, expand, goal_check):
+    counter = itertools.count()
+    heap = [(heuristic(start_state), 0, next(counter), start_state)]
+    seen = {start_state: 0}
+    while heap:
+        est_total, cost, _, state = heapq.heappop(heap)
+        if goal_check(state):
+            return cost
+        if cost > seen[state]:
+            continue
+        for nxt, step_cost in expand(state):
+            new_cost = cost + step_cost
+            if new_cost < seen.get(nxt, float('inf')):
+                seen[nxt] = new_cost
+                priority = new_cost + heuristic(nxt)
+                heapq.heappush(heap, (priority, new_cost, next(counter), nxt))
+    return -1
+\end{minted}
+\examplelist{
+  \item 773. Sliding Puzzle (Top Google)
+  \item 847. Shortest Path Visiting All Nodes (NeetCode 150)
+  \item 1293. Shortest Path in a Grid with Obstacles Elimination (NeetCode 150)
+  \item 2290. Minimum Obstacle Removal to Reach Corner (Top Amazon)
+}
+
+\coloredsection{books}{HeapOlive}{Interview Playbook}
+Rapid checks for when to reach for heaps and how to articulate trade-offs.
+
+\subsection{Decision Guide}
+\begin{itemize}
+  \item Need the best/current worst element repeatedly? Use min/max-heap.
+  \item Streaming order statistics? Pair min/max heaps (median, percentile).
+  \item K-way merge or multi-source lists? Push `(value, origin, data)` tuples.
+  \item Greedy scheduling or picking top rewards? Sort by unlock time, heap by payoff.
+  \item Weighted best-first traversal? Dijkstra/A* with `(distance, state)` heaps.
+  \item Memory tight? Keep heap size bounded at $k$.
+  \item Need deletions? Combine heap with hash map counts for lazy removal.
+\end{itemize}
+
+\subsection{Rapid Practice Sets}
+\begin{itemize}
+  \item \textbf{Blind 75 Heap Core:} 215, 239, 295, 347, 23, 973, 1046.
+  \item \textbf{NeetCode 150 Heap Tier:} 23, 253, 295, 347, 373, 378, 480, 502, 621, 692, 703, 767, 857, 973, 1046, 1405, 1675.
+  \item \textbf{Top Company Favourites:} 218, 239, 253, 355, 502, 621, 632, 745, 778, 857, 871, 1882, 2187, 2296.
+  \item \textbf{Advanced Hard Hitters:} 3015, 1675, 1834, 2208, 2542, 2599, 2654.
+\end{itemize}
+
+\end{document}

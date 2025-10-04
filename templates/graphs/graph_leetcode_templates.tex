@@ -1,0 +1,841 @@
+% Graph-Focused LeetCode Templates
+\documentclass[12pt]{article}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{fontspec}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{enumitem}
+\usepackage[outputdir=build/graphs]{minted}
+\usepackage{needspace}
+\usepackage{emoji}
+
+\setmainfont{Times New Roman}
+\setmonofont{Menlo}
+
+\definecolor{GraphBlue}{HTML}{1E90FF}
+\definecolor{codebg}{HTML}{F6F8FA}
+\definecolor{SectionGray}{HTML}{2F4F4F}
+
+\titleformat{\section}{\Large\bfseries}{\thesection}{1em}{}
+\titlespacing*{\section}{0pt}{*4}{*2}
+\titlespacing*{\subsection}{0pt}{*2}{*1}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=Black,
+  urlcolor=MidnightBlue,
+  citecolor=Black,
+  pdfauthor={Graph Patterns Playbook},
+  pdftitle={Graph Patterns Playbook},
+  pdfcreator={LaTeX with minted}
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancypagestyle{plain}{\fancyhf{}}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5em}
+\setlist[itemize]{nosep,left=0pt}
+\setstretch{1.05}
+
+\setminted{
+  bgcolor=codebg,
+  fontsize=\footnotesize,
+  breaklines=true,
+  breakanywhere=false,
+  autogobble=true,
+  linenos=false,
+  samepage=true
+}
+
+\makeatletter
+\newif\if@firstsection
+\@firstsectiontrue
+\pretocmd{\section}{\if@firstsection\global\@firstsectionfalse\else\clearpage\fi}{}{}
+\newcommand{\prepare@subsection}{\needspace{20\baselineskip}}
+\pretocmd{\subsection}{\prepare@subsection}{}{}
+\makeatother
+
+\newcommand{\coloredsection}[3]{%
+  \section{\texorpdfstring{{\color{#2}\emoji{#1}\ #3}}{#3}}
+}
+\pdfstringdefDisableCommands{\def\emoji#1{}}
+
+\newcommand{\examplelist}[1]{%
+  \textbf{Example Problems:}
+  \begin{itemize}
+    #1
+  \end{itemize}
+}
+
+\begin{document}
+
+\begin{titlepage}
+  \centering
+  {\Huge Graph Patterns Playbook \\[1em]}
+  {\Large High-Impact LeetCode Graph Templates \\[2em]}
+  {\large Updated \today \\[3em]}
+  {\large Curated from Blind 75, NeetCode 150, and top company sets}
+\end{titlepage}
+
+\thispagestyle{empty}
+\tableofcontents
+\newpage
+
+\coloredsection{link}{GraphBlue}{Graph Fundamentals}
+Building clean adjacency representations unlocks flexible traversals and ensures you can plug in search patterns quickly.
+
+\subsection{Adjacency List Builder}
+Handles directed vs. undirected edges while keeping neighbors sorted for reproducibility.
+\textbf{Complexity:} Time $O(V + E)$ to build, Space $O(V + E)$.
+\begin{minted}{python}
+from collections import defaultdict
+
+def build_graph(n, edges, directed=False):
+    graph = defaultdict(list)
+    for u, v in edges:
+        graph[u].append(v)
+        if not directed:
+            graph[v].append(u)
+    for node in graph:
+        graph[node].sort()
+    return graph
+\end{minted}
+\examplelist{
+  \item 733. Flood Fill (NeetCode 150)
+  \item 323. Number of Connected Components in an Undirected Graph (NeetCode 150)
+  \item 261. Graph Valid Tree (Top Meta/Ebay)
+  \item 2492. Minimum Score of a Path Between Two Cities (Top Amazon)
+}
+
+\subsection{Visited Bookkeeping Patterns}
+Choose between `set`, `dict`, or in-place marking depending on constraints.
+\textbf{Tip:} For dense integer labels, prefer boolean arrays; for large IDs, use hash sets.
+\examplelist{
+  \item 200. Number of Islands (Blind 75, NeetCode 150)
+  \item 133. Clone Graph (Blind 75)
+  \item 886. Possible Bipartition (NeetCode 150)
+  \item 207. Course Schedule (Blind 75, NeetCode 150)
+}
+
+\coloredsection{compass}{GraphBlue}{Traversal Patterns}
+Depth-first and breadth-first search sit at the heart of graph reasoning. Master variants like multi-source BFS or iterative DFS for stack control.
+
+\subsection{Depth-First Search (Recursive \& Iterative)}
+Recursion communicates intent; iterative variants avoid recursion limits and support custom stack seeding.
+\textbf{Complexity:} Time $O(V + E)$, Space $O(V)$.
+\begin{minted}{python}
+def dfs_recursive(graph, start):
+    seen = set()
+
+    def dfs(node):
+        if node in seen:
+            return
+        seen.add(node)
+        for nei in graph[node]:
+            dfs(nei)
+
+    dfs(start)
+    return seen
+
+
+def dfs_iterative(graph, start):
+    stack, seen = [start], set()
+    while stack:
+        node = stack.pop()
+        if node in seen:
+            continue
+        seen.add(node)
+        for nei in graph[node]:
+            if nei not in seen:
+                stack.append(nei)
+    return seen
+\end{minted}
+\examplelist{
+  \item 417. Pacific Atlantic Water Flow (NeetCode 150)
+  \item 695. Max Area of Island (NeetCode 150)
+  \item 399. Evaluate Division (Top Google)
+  \item 684. Redundant Connection (NeetCode 150)
+}
+
+\subsection{Breadth-First Search for Levels}
+Track layer depth to handle unweighted shortest path, level-order traversal, and minimum steps.
+\textbf{Complexity:} Time $O(V + E)$, Space $O(V)$.
+\begin{minted}{python}
+from collections import deque
+
+def bfs_levels(graph, start):
+    queue = deque([(start, 0)])
+    seen = {start}
+    while queue:
+        node, depth = queue.popleft()
+        yield node, depth
+        for nei in graph[node]:
+            if nei not in seen:
+                seen.add(nei)
+                queue.append((nei, depth + 1))
+\end{minted}
+\examplelist{
+  \item 127. Word Ladder (Blind 75, NeetCode 150)
+  \item 752. Open the Lock (NeetCode 150)
+  \item 433. Minimum Genetic Mutation (Top Microsoft)
+  \item 1091. Shortest Path in Binary Matrix (NeetCode 150)
+}
+
+\subsection{Multi-Source BFS}
+Seed the queue with multiple start nodes for nearest-source problems.
+\textbf{Complexity:} Time $O(V + E)$, Space $O(V)$.
+\begin{minted}{python}
+def multi_source_bfs(graph, sources):
+    queue = deque((node, 0) for node in sources)
+    seen = set(sources)
+    while queue:
+        node, depth = queue.popleft()
+        yield node, depth
+        for nei in graph[node]:
+            if nei not in seen:
+                seen.add(nei)
+                queue.append((nei, depth + 1))
+\end{minted}
+\examplelist{
+  \item 994. Rotting Oranges (NeetCode 150)
+  \item 286. Walls and Gates (Top Uber)
+  \item 1765. Map of Highest Peak (Top surveyed)
+  \item 542. 01 Matrix (Blind 75, NeetCode 150)
+}
+
+\subsection{Bidirectional BFS}
+Meet in the middle to shrink branching factor on large search spaces.
+\textbf{Complexity:} Empirically $O(b^{d/2})$ vs $O(b^d)$.
+\begin{minted}{python}
+def bidirectional_bfs(graph, start, target):
+    if start == target:
+        return 0
+    front, back = {start}, {target}
+    seen_front, seen_back = {start}, {target}
+    depth = 0
+    while front and back:
+        depth += 1
+        if len(front) > len(back):
+            front, back = back, front
+            seen_front, seen_back = seen_back, seen_front
+        next_front = set()
+        for node in front:
+            for nei in graph[node]:
+                if nei in seen_back:
+                    return depth
+                if nei not in seen_front:
+                    seen_front.add(nei)
+                    next_front.add(nei)
+        front = next_front
+    return -1
+\end{minted}
+\examplelist{
+  \item 127. Word Ladder (Blind 75)
+  \item 752. Open the Lock (NeetCode 150)
+  \item 773. Sliding Puzzle (Top Google)
+  \item 847. Shortest Path Visiting All Nodes (Top Amazon)
+}
+
+\coloredsection{satellite}{GraphBlue}{Components \& Connectivity}
+Union-Find and traversal-based component analysis solve reachability, clustering, and bipartite checks.
+
+\subsection{Connected Components Counter}
+Iterative DFS across all nodes, robust to disconnected graphs.
+\textbf{Complexity:} Time $O(V + E)$, Space $O(V)$.
+\begin{minted}{python}
+def count_components(n, edges):
+    graph = [[] for _ in range(n)]
+    for u, v in edges:
+        graph[u].append(v)
+        graph[v].append(u)
+
+    seen, components = set(), 0
+    for node in range(n):
+        if node in seen:
+            continue
+        components += 1
+        stack = [node]
+        while stack:
+            cur = stack.pop()
+            if cur in seen:
+                continue
+            seen.add(cur)
+            for nei in graph[cur]:
+                if nei not in seen:
+                    stack.append(nei)
+    return components
+\end{minted}
+\examplelist{
+  \item 323. Number of Connected Components in an Undirected Graph (NeetCode 150)
+  \item 547. Number of Provinces (Blind 75, NeetCode 150)
+  \item 200. Number of Islands (Blind 75)
+  \item 1254. Number of Closed Islands (Top Amazon)
+}
+
+\subsection{Union-Find with Path Compression}
+Lightning-fast connectivity checks and Kruskal foundation.
+\textbf{Complexity:} Amortized $\alpha(n)$ per operation.
+\begin{minted}{python}
+class UnionFind:
+    def __init__(self, n):
+        self.parent = list(range(n))
+        self.size = [1] * n
+        self.components = n
+
+    def find(self, x):
+        if self.parent[x] != x:
+            self.parent[x] = self.find(self.parent[x])
+        return self.parent[x]
+
+    def union(self, x, y):
+        rx, ry = self.find(x), self.find(y)
+        if rx == ry:
+            return False
+        if self.size[rx] < self.size[ry]:
+            rx, ry = ry, rx
+        self.parent[ry] = rx
+        self.size[rx] += self.size[ry]
+        self.components -= 1
+        return True
+\end{minted}
+\examplelist{
+  \item 684. Redundant Connection (NeetCode 150)
+  \item 721. Accounts Merge (NeetCode 150)
+  \item 990. Satisfiability of Equality Equations (Top Meta)
+  \item 1319. Number of Operations to Make Network Connected (Top Amazon)
+}
+
+\subsection{Union-Find with Rollback}
+Supports offline queries and divide-and-conquer scenarios.
+\begin{minted}{python}
+class UnionFindRollback:
+    def __init__(self, n):
+        self.parent = list(range(n))
+        self.size = [1] * n
+        self.history = []
+
+    def find(self, x):
+        while self.parent[x] != x:
+            x = self.parent[x]
+        return x
+
+    def union(self, x, y):
+        x, y = self.find(x), self.find(y)
+        if x == y:
+            self.history.append((-1, -1, -1))
+            return False
+        if self.size[x] < self.size[y]:
+            x, y = y, x
+        self.history.append((y, self.parent[y], self.size[x]))
+        self.parent[y] = x
+        self.size[x] += self.size[y]
+        return True
+
+    def snapshot(self):
+        return len(self.history)
+
+    def rollback(self, snap):
+        while len(self.history) > snap:
+            node, parent, size_before = self.history.pop()
+            if node == -1:
+                continue
+            root = self.parent[node]
+            self.parent[node] = parent
+            self.size[root] = size_before
+\end{minted}
+\examplelist{
+  \item 1202. Smallest String With Swaps (NeetCode 150) \textit{baseline DSU}
+  \item 1627. Graph Connectivity With Threshold (Hard, offline unions)
+  \item 1697. Checking Existence of Edge Length Limited Paths (NeetCode 150 Hard)
+  \item Competitive programming dynamic connectivity sets (Codeforces EDU, AtCoder) for rollback drills
+}
+
+\subsection{Bipartite Check via Coloring}
+Two-coloring with BFS catches odd cycles.
+\textbf{Complexity:} Time $O(V + E)$.
+\begin{minted}{python}
+def is_bipartite(graph):
+    color = {}
+    for node in graph:
+        if node in color:
+            continue
+        queue = deque([node])
+        color[node] = 0
+        while queue:
+            cur = queue.popleft()
+            for nei in graph[cur]:
+                if nei not in color:
+                    color[nei] = color[cur] ^ 1
+                    queue.append(nei)
+                elif color[nei] == color[cur]:
+                    return False
+    return True
+\end{minted}
+\examplelist{
+  \item 785. Is Graph Bipartite? (NeetCode 150)
+  \item 886. Possible Bipartition (NeetCode 150)
+  \item 1042. Flower Planting With No Adjacent (Top Google)
+  \item 2493. Divide Nodes Into the Maximum Number of Groups (Top Meta)
+}
+
+\coloredsection{arrows-clockwise}{GraphBlue}{Directed Graphs \& Ordering}
+Directed acyclic graph techniques resolve scheduling, dependencies, and reachability with direction.
+
+\subsection{Cycle Detection (DFS with Path Set)}
+Track recursion stack to spot back edges in directed graphs.
+\textbf{Complexity:} Time $O(V + E)$.
+\begin{minted}{python}
+def has_cycle_directed(graph):
+    seen, path = set(), set()
+
+    def dfs(node):
+        if node in path:
+            return True
+        if node in seen:
+            return False
+        seen.add(node)
+        path.add(node)
+        for nei in graph[node]:
+            if dfs(nei):
+                return True
+        path.remove(node)
+        return False
+
+    return any(dfs(node) for node in graph)
+\end{minted}
+\examplelist{
+  \item 207. Course Schedule (Blind 75)
+  \item 802. Find Eventual Safe States (NeetCode 150)
+  \item 1059. All Paths from Source Lead to Destination (Top Amazon)
+  \item 2360. Longest Cycle in a Graph (Top Google)
+}
+
+\subsection{Topological Sort (Kahn's Algorithm)}
+BFS with indegree tracking produces a valid order or detects cycles.
+\textbf{Complexity:} Time $O(V + E)$.
+\begin{minted}{python}
+def topo_sort(n, edges):
+    indegree = [0] * n
+    graph = [[] for _ in range(n)]
+    for u, v in edges:
+        graph[u].append(v)
+        indegree[v] += 1
+
+    queue = deque(node for node in range(n) if indegree[node] == 0)
+    order = []
+    while queue:
+        node = queue.popleft()
+        order.append(node)
+        for nei in graph[node]:
+            indegree[nei] -= 1
+            if indegree[nei] == 0:
+                queue.append(nei)
+    return order if len(order) == n else []
+\end{minted}
+\examplelist{
+  \item 210. Course Schedule II (NeetCode 150)
+  \item 269. Alien Dictionary (Top Google)
+  \item 444. Sequence Reconstruction (Top Amazon)
+  \item 1203. Sort Items by Groups Respecting Dependencies (Top Meta)
+}
+
+\subsection{Topological Sort (DFS Post-Order)}
+Reverse post-order from DFS for stack-based ordering.
+\begin{minted}{python}
+def topo_sort_dfs(n, edges):
+    graph = [[] for _ in range(n)]
+    for u, v in edges:
+        graph[u].append(v)
+
+    seen, stack, path = set(), [], set()
+
+    def dfs(node):
+        if node in path:
+            return False
+        if node in seen:
+            return True
+        seen.add(node)
+        path.add(node)
+        for nei in graph[node]:
+            if not dfs(nei):
+                return False
+        path.remove(node)
+        stack.append(node)
+        return True
+
+    for node in range(n):
+        if not dfs(node):
+            return []
+    return stack[::-1]
+\end{minted}
+\examplelist{
+  \item 2115. Find All Possible Recipes from Given Supplies (Top Amazon)
+  \item 1203. Sort Items by Groups Respecting Dependencies (NeetCode 150 Hard)
+  \item 1494. Parallel Courses II (Top Meta)
+  \item 2050. Parallel Courses III (Top Meta)
+}
+
+\subsection{Strongly Connected Components (Tarjan)}
+Tarjan uses a single DFS with low-link values.
+\textbf{Complexity:} Time $O(V + E)$.
+\begin{minted}{python}
+def tarjans_scc(n, edges):
+    graph = [[] for _ in range(n)]
+    for u, v in edges:
+        graph[u].append(v)
+
+    index = 0
+    ids = [-1] * n
+    low = [0] * n
+    on_stack = [False] * n
+    stack, components = [], []
+
+    def dfs(at):
+        nonlocal index
+        ids[at] = low[at] = index
+        index += 1
+        stack.append(at)
+        on_stack[at] = True
+
+        for to in graph[at]:
+            if ids[to] == -1:
+                dfs(to)
+                low[at] = min(low[at], low[to])
+            elif on_stack[to]:
+                low[at] = min(low[at], ids[to])
+
+        if ids[at] == low[at]:
+            component = []
+            while True:
+                node = stack.pop()
+                on_stack[node] = False
+                component.append(node)
+                if node == at:
+                    break
+            components.append(component)
+
+    for v in range(n):
+        if ids[v] == -1:
+            dfs(v)
+    return components
+\end{minted}
+\examplelist{
+  \item 2360. Longest Cycle in a Graph (Top Google)
+  \item 2127. Maximum Employees to Be Invited to a Meeting (Top Meta)
+  \item 1203. Sort Items by Groups Respecting Dependencies (NeetCode 150 Hard)
+  \item 2699. Modify Graph Edge Weights (Hard) \textit{SCC feasibility}
+}
+
+\coloredsection{rocket}{GraphBlue}{Shortest Paths}
+Choose algorithms based on edge weights and restrictions: BFS for unweighted, Dijkstra for non-negative weights, Bellman-Ford for negatives, Floyd-Warshall for all-pairs.
+
+\subsection{Unweighted Shortest Path (BFS)}
+Return distance and optionally parent mapping.
+\begin{minted}{python}
+def bfs_shortest_path(graph, start, target):
+    queue = deque([(start, 0)])
+    seen = {start}
+    parent = {start: None}
+    while queue:
+        node, dist = queue.popleft()
+        if node == target:
+            path = []
+            while node is not None:
+                path.append(node)
+                node = parent[node]
+            return dist, path[::-1]
+        for nei in graph[node]:
+            if nei not in seen:
+                seen.add(nei)
+                parent[nei] = node
+                queue.append((nei, dist + 1))
+    return -1, []
+\end{minted}
+\examplelist{
+  \item 279. Perfect Squares (Blind 75)
+  \item 1293. Shortest Path in a Grid with Obstacles Elimination (NeetCode 150)
+  \item 847. Shortest Path Visiting All Nodes (Top Amazon)
+  \item 1730. Shortest Path to Get Food (Top DoorDash)
+}
+
+\subsection{0-1 BFS}
+Deque-based shortest path when edge weights are 0 or 1.
+\textbf{Complexity:} Time $O(V + E)$.
+\begin{minted}{python}
+from collections import deque
+
+def zero_one_bfs(n, edges, start):
+    graph = [[] for _ in range(n)]
+    for u, v, w in edges:
+        graph[u].append((v, w))
+        graph[v].append((u, w))
+
+    dist = [float('inf')] * n
+    dist[start] = 0
+    dq = deque([start])
+    while dq:
+        node = dq.popleft()
+        for nei, weight in graph[node]:
+            new_dist = dist[node] + weight
+            if new_dist < dist[nei]:
+                dist[nei] = new_dist
+                if weight == 0:
+                    dq.appendleft(nei)
+                else:
+                    dq.append(nei)
+    return dist
+\end{minted}
+\examplelist{
+  \item 1368. Minimum Cost to Make at Least One Valid Path in a Grid (Top Google)
+  \item 2290. Minimum Obstacle Removal to Reach Corner (Top Amazon)
+  \item Competitive programming playlists (CSES Advanced Graph, Codeforces 0-1 BFS classics)
+}
+
+\subsection{Dijkstra's Algorithm}
+Priority queue handles non-negative weighted edges.
+\textbf{Complexity:} Time $O((V + E) \log V)$.
+\begin{minted}{python}
+import heapq
+from collections import defaultdict
+
+def dijkstra(n, edges, start):
+    graph = defaultdict(list)
+    for u, v, w in edges:
+        graph[u].append((v, w))
+
+    dist = [float('inf')] * n
+    dist[start] = 0
+    heap = [(0, start)]
+    while heap:
+        cur_dist, node = heapq.heappop(heap)
+        if cur_dist > dist[node]:
+            continue
+        for nei, weight in graph[node]:
+            new_dist = cur_dist + weight
+            if new_dist < dist[nei]:
+                dist[nei] = new_dist
+                heapq.heappush(heap, (new_dist, nei))
+    return dist
+\end{minted}
+\examplelist{
+  \item 743. Network Delay Time (Blind 75, NeetCode 150)
+  \item 1514. Path with Maximum Probability (NeetCode 150)
+  \item 1631. Path With Minimum Effort (NeetCode 150)
+  \item 1786. Number of Restricted Paths From First to Last Node (Top Amazon)
+}
+
+\subsection{Bellman-Ford}
+Detects negative cycles and handles edges with negative weights.
+\textbf{Complexity:} Time $O(V \cdot E)$.
+\begin{minted}{python}
+def bellman_ford(n, edges, start):
+    dist = [float('inf')] * n
+    dist[start] = 0
+    for _ in range(n - 1):
+        updated = False
+        for u, v, w in edges:
+            if dist[u] + w < dist[v]:
+                dist[v] = dist[u] + w
+                updated = True
+        if not updated:
+            break
+    for u, v, w in edges:
+        if dist[u] + w < dist[v]:
+            return None  # negative cycle detected
+    return dist
+\end{minted}
+\examplelist{
+  \item 787. Cheapest Flights Within K Stops (NeetCode 150)
+  \item 1514. Path with Maximum Probability (NeetCode 150) \textit{via log-weights + relaxation}
+  \item 1462. Course Schedule IV (Top Amazon)
+  \item UVA 558. Wormholes (classic negative-cycle detection drill)
+}
+
+\subsection{Floyd-Warshall}
+All-pairs shortest paths via DP, also detects negative cycles.
+\textbf{Complexity:} Time $O(V^3)$.
+\begin{minted}{python}
+def floyd_warshall(n, dist):
+    for k in range(n):
+        for i in range(n):
+            for j in range(n):
+                if dist[i][k] + dist[k][j] < dist[i][j]:
+                    dist[i][j] = dist[i][k] + dist[k][j]
+    return dist
+\end{minted}
+\examplelist{
+  \item 1334. Find the City With the Smallest Number of Neighbors at a Threshold Distance (NeetCode 150)
+  \item 1462. Course Schedule IV (Top Amazon)
+  \item 2192. All Ancestors of a Node in a Directed Acyclic Graph (Top Meta)
+  \item 2642. Design Graph With Shortest Path Calculator (Hard system design)
+}
+
+\coloredsection{world-map}{GraphBlue}{Spanning Trees \& Cuts}
+Minimum spanning trees and bridge detection appear frequently in infrastructure-style questions.
+
+\subsection{Kruskal's Algorithm}
+Sort edges by weight and union components.
+\textbf{Complexity:} Time $O(E \log E)$.
+\begin{minted}{python}
+def kruskal(n, edges):
+    uf = UnionFind(n)
+    total_weight = 0
+    for w, u, v in sorted(edges):
+        if uf.union(u, v):
+            total_weight += w
+    return total_weight
+\end{minted}
+\examplelist{
+  \item 1584. Min Cost to Connect All Points (NeetCode 150)
+  \item 1135. Connecting Cities With Minimum Cost (Top Amazon)
+  \item 1168. Optimize Water Distribution in a Village (Top Google)
+  \item 2492. Minimum Score of a Path Between Two Cities (Top Amazon)
+}
+
+\subsection{Prim's Algorithm (PQ Variant)}
+Grow MST from a seed vertex using a heap.
+\textbf{Complexity:} Time $O(E \log V)$.
+\begin{minted}{python}
+def prim(n, graph, start=0):
+    seen = {start}
+    edges = []
+    for to, w in graph[start]:
+        heapq.heappush(edges, (w, start, to))
+    total = 0
+    while edges and len(seen) < n:
+        w, frm, to = heapq.heappop(edges)
+        if to in seen:
+            continue
+        seen.add(to)
+        total += w
+        for nxt, weight in graph[to]:
+            if nxt not in seen:
+                heapq.heappush(edges, (weight, to, nxt))
+    return total if len(seen) == n else float('inf')
+\end{minted}
+\examplelist{
+  \item 1584. Min Cost to Connect All Points (NeetCode 150)
+  \item 1135. Connecting Cities With Minimum Cost (Top Amazon)
+  \item 1168. Optimize Water Distribution in a Village (Top Google)
+  \item 2812. Find the Safest Path in a Grid (Prim over risk graph)
+}
+
+\subsection{Bridge Detection (Tarjan)}
+Low-link values identify critical edges.
+\textbf{Complexity:} Time $O(V + E)$.
+\begin{minted}{python}
+def bridges(n, edges):
+    graph = [[] for _ in range(n)]
+    for u, v in edges:
+        graph[u].append(v)
+        graph[v].append(u)
+
+    ids = [-1] * n
+    low = [0] * n
+    time = 0
+    result = []
+
+    def dfs(node, parent):
+        nonlocal time
+        ids[node] = low[node] = time
+        time += 1
+        for nei in graph[node]:
+            if nei == parent:
+                continue
+            if ids[nei] == -1:
+                dfs(nei, node)
+                low[node] = min(low[node], low[nei])
+                if ids[node] < low[nei]:
+                    result.append((node, nei))
+            else:
+                low[node] = min(low[node], ids[nei])
+
+    for node in range(n):
+        if ids[node] == -1:
+            dfs(node, -1)
+    return result
+\end{minted}
+\examplelist{
+  \item 1192. Critical Connections in a Network (Blind 75)
+  \item 1489. Find Critical and Pseudo-Critical Edges in Minimum Spanning Tree (NeetCode 150 Hard)
+  \item 1568. Minimum Number of Days to Disconnect Island (Top Amazon)
+  \item 2492. Minimum Score of a Path Between Two Cities (Top Amazon)
+}
+
+\coloredsection{dart}{GraphBlue}{Stateful Graph Search}
+Many interview staples embed extra state in BFS nodes (position + keys, obstacles, etc.).
+
+\subsection{BFS with Bitmask State}
+Use tuples to encode location and collected keys/visited states.
+\textbf{Complexity:} Time $O(V \cdot 2^k)$ when tracking $k$ bits.
+\begin{minted}{python}
+def bfs_bitmask(start_state, next_states, goal_check):
+    queue = deque([(start_state, 0)])
+    seen = {start_state}
+    while queue:
+        state, dist = queue.popleft()
+        if goal_check(state):
+            return dist
+        for nxt in next_states(state):
+            if nxt not in seen:
+                seen.add(nxt)
+                queue.append((nxt, dist + 1))
+    return -1
+\end{minted}
+\examplelist{
+  \item 864. Shortest Path to Get All Keys (NeetCode 150)
+  \item 847. Shortest Path Visiting All Nodes (Blind 75)
+  \item 1293. Shortest Path in a Grid with Obstacles Elimination (NeetCode 150)
+  \item 773. Sliding Puzzle (Top Google)
+}
+
+\subsection{Graph + Binary Search Hybrid}
+Binary search on answer plus connectivity check is common when answer space is monotonic.
+\textbf{Complexity:} $O(\log M \cdot (V+E))$ where $M$ is answer search space.
+\begin{minted}{python}
+def binary_search_answer(lo, hi, feasible):
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if feasible(mid):
+            hi = mid
+        else:
+            lo = mid + 1
+    return lo
+\end{minted}
+\examplelist{
+  \item 1631. Path With Minimum Effort (NeetCode 150)
+  \item 778. Swim in Rising Water (Blind 75)
+  \item 1102. Path With Maximum Minimum Value (Top Amazon)
+  \item 1970. Last Day Where You Can Still Cross (NeetCode 150)
+}
+
+\coloredsection{bulb}{GraphBlue}{Interview Playbook}
+Quick checklist to choose the right graph pattern under pressure.
+
+\subsection{Decision Guide}
+\begin{itemize}
+  \item Need to count components or determine connectivity? Use DFS/BFS or Union-Find.
+  \item Unweighted shortest paths or minimum moves? Use BFS; consider bidirectional or multi-source variants.
+  \item Non-negative weights? Reach for Dijkstra or 0-1 BFS when weights are binary.
+  \item Negative edges? Use Bellman-Ford (detect cycles) or SPFA variants in practice.
+  \item Dependencies with no cycles? Apply topological sort (Kahn or DFS).
+  \item Repeated connectivity queries offline? Union-Find with rollback or segment tree divide-and-conquer.
+  \item Need all-pairs or dense graphs? Floyd-Warshall or repeated Dijkstra.
+  \item Weighted spanning tree? Kruskal or Prim depending on input form.
+\end{itemize}
+
+\subsection{Rapid Practice Sets}
+\begin{itemize}
+  \item \textbf{Blind 75 Graph Core:} 133, 200, 207, 210, 323, 417, 684, 695, 733, 802.
+  \item \textbf{NeetCode 150 Graph Tier:} 127, 133, 146, 200, 207, 210, 329, 399, 542, 694, 695, 743, 752, 778, 802, 886, 994, 1020, 1192, 1514, 1631.
+  \item \textbf{Top Company Heat Map (FAANG + Unicorns):} 269, 310, 332, 399, 490, 721, 752, 787, 934, 1091, 1192, 1293, 1584, 1631, 1976, 2493.
+  \item \textbf{Advanced Hard Hitters:} 691, 815, 847, 1203, 1368, 1489, 1494, 1559, 1609, 1970, 2050.
+\end{itemize}
+
+\end{document}
