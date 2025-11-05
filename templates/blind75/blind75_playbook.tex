@@ -1,0 +1,1657 @@
+% Blind 75 Reference Playbook
+\documentclass[12pt]{article}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{fontspec}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{etoolbox}
+\usepackage{enumitem}
+\usepackage{minted}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{needspace}
+\usepackage{emoji}
+
+\setmainfont{Times New Roman}
+\setmonofont{Menlo}
+
+\definecolor{BlindBlue}{HTML}{0052CC}
+\definecolor{ArrayIndigo}{HTML}{4B0082}
+\definecolor{BinaryRed}{HTML}{B22222}
+\definecolor{DPTeal}{HTML}{008080}
+\definecolor{GraphGreen}{HTML}{2E8B57}
+\definecolor{IntervalGold}{HTML}{DAA520}
+\definecolor{LinkedRose}{HTML}{FF6F91}
+\definecolor{MatrixPurple}{HTML}{6A5ACD}
+\definecolor{StringOrange}{HTML}{FF8C00}
+\definecolor{TreeOlive}{HTML}{556B2F}
+\definecolor{HeapCyan}{HTML}{008B8B}
+\definecolor{BacktrackPlum}{HTML}{8E44AD}
+
+\titleformat{\section}{\Large\bfseries}{\thesection}{1em}{}
+\titlespacing*{\section}{0pt}{*4}{*2}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=Black,
+  urlcolor=MidnightBlue,
+  citecolor=Black,
+  pdfauthor={Blind 75 Reference Playbook},
+  pdftitle={Blind 75 Reference Playbook},
+  pdfcreator={\LaTeX}
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancypagestyle{plain}{\fancyhf{}}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5em}
+\setlist[itemize]{nosep,left=0pt}
+\setstretch{1.05}
+\renewcommand{\arraystretch}{1.2}
+\setlength{\tabcolsep}{6pt}
+
+\setminted{
+  bgcolor=Gray!5,
+  fontsize=\footnotesize,
+  breaklines=true,
+  autogobble=true,
+  linenos=false,
+  samepage=true
+}
+
+\newif\iffirstsection
+\firstsectiontrue
+\pretocmd{\section}{\iffirstsection\global\firstsectionfalse\else\clearpage\fi}{}{}
+\newcommand{\preparetabular}{\needspace{18\baselineskip}}
+\pretocmd{\subsection}{\needspace{18\baselineskip}}{}{}
+
+\newcommand{\coloredsection}[3]{%
+  \section{\texorpdfstring{{\color{#2}\emoji{#1}\ #3}}{#3}}
+}
+\pdfstringdefDisableCommands{\def\emoji#1{}}
+
+\newcommand{\problemrow}[4]{%
+  #1 & \href{https://leetcode.com/problems/#3/}{#2} & #4\\
+}
+
+\newcommand{\blindsubsection}[3]{%
+  \subsection{\texorpdfstring{\href{https://leetcode.com/problems/#2/}{#1.\ #3}}{#1. #3}}%
+}
+
+\begin{document}
+
+\begin{titlepage}
+  \centering
+  {\Huge Blind 75 Reference Playbook \\[1em]}
+  {\Large Complete Quick-Glance Guide for the Classic Set \\[2em]}
+  {\large Updated \today \\[3em]}
+  {\large Curated notes to speed up refresh sessions before interviews}
+\end{titlepage}
+
+\thispagestyle{empty}
+\tableofcontents
+\newpage
+
+\coloredsection{bar-chart}{ArrayIndigo}{Array \& Hashing Overview}
+\preparetabular
+\small
+\begin{tabularx}{\textwidth}{@{}p{1.5cm}p{6cm}X@{}}
+\toprule
+\textbf{ID} & \textbf{Problem} & \textbf{Patterns \& Tactical Notes} \\
+\midrule
+\problemrow{1}{Two Sum}{two-sum}{Hash map complements; watch for duplicate indices.}
+\problemrow{121}{Best Time to Buy and Sell Stock}{best-time-to-buy-and-sell-stock}{Track running minimum price; one pass $O(n)$.}
+\problemrow{217}{Contains Duplicate}{contains-duplicate}{Set membership or sort; $O(n)$ with hash set.}
+\problemrow{238}{Product of Array Except Self}{product-of-array-except-self}{Prefix/suffix products without division; constant extra space.}
+\problemrow{53}{Maximum Subarray}{maximum-subarray}{Kadane's algorithm; track best ending here vs. global best.}
+\problemrow{152}{Maximum Product Subarray}{maximum-product-subarray}{Maintain max/min prefix products to handle negatives.}
+\problemrow{153}{Find Minimum in Rotated Sorted Array}{find-minimum-in-rotated-sorted-array}{Binary search pivot; compare mid with right.}
+\problemrow{33}{Search in Rotated Sorted Array}{search-in-rotated-sorted-array}{Identify sorted half each iteration; adjust binary search bounds.}
+\problemrow{15}{3Sum}{3sum}{Sort + two pointers; skip duplicates to stay $O(n^2)$.}
+\problemrow{11}{Container With Most Water}{container-with-most-water}{Two pointers moving inward; shrink shorter wall.}
+\bottomrule
+\end{tabularx}
+
+\coloredsection{abacus}{BinaryRed}{Binary \& Bit Manipulation Overview}
+\preparetabular
+\small
+\begin{tabularx}{\textwidth}{@{}p{1.5cm}p{6cm}X@{}}
+\toprule
+\textbf{ID} & \textbf{Problem} & \textbf{Patterns \& Tactical Notes} \\
+\midrule
+\problemrow{371}{Sum of Two Integers}{sum-of-two-integers}{Bitwise XOR for sum, AND for carry; iterate until carry vanishes.}
+\problemrow{191}{Number of 1 Bits}{number-of-1-bits}{Use n\&=n-1 trick to clear lowest set bit.}
+\problemrow{338}{Counting Bits}{counting-bits}{Build DP by offset or popcount relation: $dp[i]=dp[i/2]+i\%2$.}
+\problemrow{268}{Missing Number}{missing-number}{XOR index with value or use Gauss summation.}
+\problemrow{190}{Reverse Bits}{reverse-bits}{Bitwise shifts; mask low bit, build reversed result.}
+\bottomrule
+\end{tabularx}
+
+\coloredsection{shamrock}{DPTeal}{Dynamic Programming Overview}
+\preparetabular
+\small
+\begin{tabularx}{\textwidth}{@{}p{1.5cm}p{6cm}X@{}}
+\toprule
+\textbf{ID} & \textbf{Problem} & \textbf{Patterns \& Tactical Notes} \\
+\midrule
+\problemrow{70}{Climbing Stairs}{climbing-stairs}{Classic Fibonacci DP; iterative two-variable solution.}
+\problemrow{322}{Coin Change}{coin-change}{Bottom-up DP; initialize to inf, iterate coins outer.}
+\problemrow{300}{Longest Increasing Subsequence}{longest-increasing-subsequence}{Patience sorting with binary search for $O(n\log n)$.}
+\problemrow{1143}{Longest Common Subsequence}{longest-common-subsequence}{2D DP; reuse rolling rows for $O(nm)$ time, $O(m)$ space.}
+\problemrow{139}{Word Break}{word-break}{DP on prefix validity using hash set dictionary.}
+\problemrow{377}{Combination Sum IV}{combination-sum-iv}{Order matters; one-dimensional DP across target.}
+\problemrow{198}{House Robber}{house-robber}{Either rob or skip; tracking two states is enough.}
+\problemrow{213}{House Robber II}{house-robber-ii}{Handle circularity via two linear robber runs (exclude first/last).}
+\problemrow{91}{Decode Ways}{decode-ways}{DP on index; beware invalid zeros and bounds.}
+\problemrow{62}{Unique Paths}{unique-paths}{Combinatorics or DP grid; row-by-row accumulation.}
+\problemrow{55}{Jump Game}{jump-game}{Greedy reachability; maintain furthest index reachable so far.}
+\bottomrule
+\end{tabularx}
+
+\coloredsection{globe-showing-europe-africa}{GraphGreen}{Graphs \& Traversals Overview}
+\preparetabular
+\small
+\begin{tabularx}{\textwidth}{@{}p{1.5cm}p{6cm}X@{}}
+\toprule
+\textbf{ID} & \textbf{Problem} & \textbf{Patterns \& Tactical Notes} \\
+\midrule
+\problemrow{133}{Clone Graph}{clone-graph}{DFS/BFS with hash map from original node to clone.}
+\problemrow{207}{Course Schedule}{course-schedule}{Topological sort via Kahn's algorithm or DFS cycle detection.}
+\problemrow{417}{Pacific Atlantic Water Flow}{pacific-atlantic-water-flow}{Reverse BFS/DFS from oceans; intersect reachable sets.}
+\problemrow{200}{Number of Islands}{number-of-islands}{Flood-fill grid; mark visited in-place for $O(1)$ extra space.}
+\problemrow{261}{Graph Valid Tree}{graph-valid-tree}{Check edges == n-1 and no cycle via UF or DFS.}
+\problemrow{323}{Number of Connected Components in an Undirected Graph}{number-of-connected-components-in-an-undirected-graph}{Union-find or DFS across adjacency list.}
+\problemrow{127}{Word Ladder}{word-ladder}{Bidirectional BFS on wildcard adjacency to reduce branching.}
+\bottomrule
+\end{tabularx}
+
+\coloredsection{spiral-shell}{IntervalGold}{Interval Scheduling Overview}
+\preparetabular
+\small
+\begin{tabularx}{\textwidth}{@{}p{1.5cm}p{6cm}X@{}}
+\toprule
+\textbf{ID} & \textbf{Problem} & \textbf{Patterns \& Tactical Notes} \\
+\midrule
+\problemrow{57}{Insert Interval}{insert-interval}{Linear sweep merging overlaps; append tail segments.}
+\problemrow{56}{Merge Intervals}{merge-intervals}{Sort by start then merge greedily.}
+\problemrow{435}{Non-overlapping Intervals}{non-overlapping-intervals}{Greedy by earliest finish; count removals.}
+\problemrow{252}{Meeting Rooms}{meeting-rooms}{Sort starts vs. ends; ensure rooms needed does not exceed 1.}
+\bottomrule
+\end{tabularx}
+
+\coloredsection{link}{LinkedRose}{Linked List Overview}
+\preparetabular
+\small
+\begin{tabularx}{\textwidth}{@{}p{1.5cm}p{6cm}X@{}}
+\toprule
+\textbf{ID} & \textbf{Problem} & \textbf{Patterns \& Tactical Notes} \\
+\midrule
+\problemrow{206}{Reverse Linked List}{reverse-linked-list}{Iterative pointer flip; maintain prev, curr, next.}
+\problemrow{21}{Merge Two Sorted Lists}{merge-two-sorted-lists}{Dummy head + two pointers; operate in-place.}
+\problemrow{143}{Reorder List}{reorder-list}{Split middle, reverse second half, interleave nodes.}
+\problemrow{19}{Remove Nth Node From End of List}{remove-nth-node-from-end-of-list}{Two-pointer window or sentinel + length count.}
+\problemrow{141}{Linked List Cycle}{linked-list-cycle}{Floyd's tortoise and hare cycle detection.}
+\bottomrule
+\end{tabularx}
+
+\coloredsection{magic-wand}{MatrixPurple}{Matrix Manipulation Overview}
+\preparetabular
+\small
+\begin{tabularx}{\textwidth}{@{}p{1.5cm}p{6cm}X@{}}
+\toprule
+\textbf{ID} & \textbf{Problem} & \textbf{Patterns \& Tactical Notes} \\
+\midrule
+\problemrow{73}{Set Matrix Zeroes}{set-matrix-zeroes}{Use first row/col as markers to keep $O(1)$ space.}
+\problemrow{54}{Spiral Matrix}{spiral-matrix}{Iteratively peel layers tracking four boundaries.}
+\problemrow{48}{Rotate Image}{rotate-image}{Transpose + reverse rows for in-place rotation.}
+\problemrow{79}{Word Search}{word-search}{Backtracking DFS with visited state; prune early on mismatch.}
+\bottomrule
+\end{tabularx}
+
+\coloredsection{books}{StringOrange}{String Patterns Overview}
+\preparetabular
+\small
+\begin{tabularx}{\textwidth}{@{}p{1.5cm}p{6cm}X@{}}
+\toprule
+\textbf{ID} & \textbf{Problem} & \textbf{Patterns \& Tactical Notes} \\
+\midrule
+\problemrow{3}{Longest Substring Without Repeating Characters}{longest-substring-without-repeating-characters}{Sliding window with index map; shrink when duplicate seen.}
+\problemrow{424}{Longest Repeating Character Replacement}{longest-repeating-character-replacement}{Window maintain max frequency; shrink when window - max > k.}
+\problemrow{76}{Minimum Window Substring}{minimum-window-substring}{Two-pointer window counting required chars; expand/contract with frequency map.}
+\problemrow{242}{Valid Anagram}{valid-anagram}{Char count array for lowercase; compare counts.}
+\problemrow{49}{Group Anagrams}{group-anagrams}{Sort signature or letter counts as hash key.}
+\problemrow{20}{Valid Parentheses}{valid-parentheses}{Stack track opening brackets; ensure final stack empty.}
+\problemrow{125}{Valid Palindrome}{valid-palindrome}{Two pointers ignore non-alphanumeric; case-normalize.}
+\problemrow{5}{Longest Palindromic Substring}{longest-palindromic-substring}{Expand around centers; track best window.}
+\problemrow{647}{Palindromic Substrings}{palindromic-substrings}{Center expansion counts palindromes in $O(n^2)$.}
+\problemrow{271}{Encode and Decode Strings}{encode-and-decode-strings}{Length-prefix encoding to handle delimiter collisions.}
+\bottomrule
+\end{tabularx}
+
+\coloredsection{deciduous-tree}{TreeOlive}{Binary Tree Toolkit Overview}
+\preparetabular
+\small
+\begin{tabularx}{\textwidth}{@{}p{1.5cm}p{6cm}X@{}}
+\toprule
+\textbf{ID} & \textbf{Problem} & \textbf{Patterns \& Tactical Notes} \\
+\midrule
+\problemrow{104}{Maximum Depth of Binary Tree}{maximum-depth-of-binary-tree}{DFS depth calculation; return 1 + max(left, right).}
+\problemrow{100}{Same Tree}{same-tree}{Recursive structural + value equality check.}
+\problemrow{226}{Invert Binary Tree}{invert-binary-tree}{Swap children recursively or via BFS.}
+\problemrow{102}{Binary Tree Level Order Traversal}{binary-tree-level-order-traversal}{Queue BFS capturing per-level nodes.}
+\problemrow{572}{Subtree of Another Tree}{subtree-of-another-tree}{DFS roots comparing structures; serialize for optimization.}
+\problemrow{105}{Construct Binary Tree from Preorder and Inorder Traversal}{construct-binary-tree-from-preorder-and-inorder-traversal}{Use preorder root + inorder index map for recursion.}
+\problemrow{98}{Validate Binary Search Tree}{validate-binary-search-tree}{Maintain min/max bounds during DFS.}
+\problemrow{230}{Kth Smallest Element in a BST}{kth-smallest-element-in-a-bst}{Inorder traversal yields sorted order; stop at k.}
+\problemrow{235}{Lowest Common Ancestor of a Binary Search Tree}{lowest-common-ancestor-of-a-binary-search-tree}{Traverse using BST property; diverging node is LCA.}
+\problemrow{124}{Binary Tree Maximum Path Sum}{binary-tree-maximum-path-sum}{Postorder tracking max gain from children; update global best.}
+\problemrow{297}{Serialize and Deserialize Binary Tree}{serialize-and-deserialize-binary-tree}{Preorder with null markers; use iterator for decode.}
+\bottomrule
+\end{tabularx}
+
+\coloredsection{gem-stone}{HeapCyan}{Heaps \& Priority Queues Overview}
+\preparetabular
+\small
+\begin{tabularx}{\textwidth}{@{}p{1.5cm}p{6cm}X@{}}
+\toprule
+\textbf{ID} & \textbf{Problem} & \textbf{Patterns \& Tactical Notes} \\
+\midrule
+\problemrow{23}{Merge k Sorted Lists}{merge-k-sorted-lists}{Min-heap of list heads; push next node after pop.}
+\problemrow{347}{Top K Frequent Elements}{top-k-frequent-elements}{Frequency map + heap or bucket sort for $O(n)$.}
+\problemrow{295}{Find Median from Data Stream}{find-median-from-data-stream}{Two heaps balancing lower, upper halves.}
+\bottomrule
+\end{tabularx}
+
+\coloredsection{performing-arts}{BacktrackPlum}{Backtracking Patterns Overview}
+\preparetabular
+\small
+\begin{tabularx}{\textwidth}{@{}p{1.5cm}p{6cm}X@{}}
+\toprule
+\textbf{ID} & \textbf{Problem} & \textbf{Patterns \& Tactical Notes} \\
+\midrule
+\problemrow{78}{Subsets}{subsets}{DFS include/exclude pattern; use iterative expansion as alternative.}
+\problemrow{39}{Combination Sum}{combination-sum}{DFS with repeat allowed; maintain start index, prune when sum exceeds target.}
+\problemrow{46}{Permutations}{permutations}{Swap in-place or track used set; depth equals length.}
+\problemrow{131}{Palindrome Partitioning}{palindrome-partitioning}{Backtrack with palindrome check; precompute pal table if needed.}
+\problemrow{17}{Letter Combinations of a Phone Number}{letter-combinations-of-a-phone-number}{Map digits to letters; build combinations recursively.}
+\bottomrule
+\end{tabularx}
+
+\section{Deep Dive Playbook}
+Each Blind 75 problem below includes a focused reminder, complexity summary, and a clean Python 3 template you can adapt quickly. Mirror the structure you favor during interviews and annotate directly in the PDF as you review.
+
+\coloredsection{bar-chart}{ArrayIndigo}{Array \& Hashing Deep Dive}
+
+\blindsubsection{1}{two-sum}{Two Sum}
+\textbf{Key Idea:} Store complements in a hash map while scanning once. \textbf{Complexity:} Time $O(n)$, Space $O(n)$.
+\begin{minted}{python}
+def twoSum(nums, target):
+    index = {}
+    for i, num in enumerate(nums):
+        diff = target - num
+        if diff in index:
+            return [index[diff], i]
+        index[num] = i
+    return []
+\end{minted}
+
+\blindsubsection{121}{best-time-to-buy-and-sell-stock}{Best Time to Buy and Sell Stock}
+\textbf{Key Idea:} Track the running minimum price and best profit in a single pass. \textbf{Complexity:} Time $O(n)$, Space $O(1)$.
+\begin{minted}{python}
+def maxProfit(prices):
+    best = 0
+    min_price = prices[0]
+    for price in prices[1:]:
+        best = max(best, price - min_price)
+        min_price = min(min_price, price)
+    return best
+\end{minted}
+
+\blindsubsection{217}{contains-duplicate}{Contains Duplicate}
+\textbf{Key Idea:} Use a hash set to short-circuit on first repeat. \textbf{Complexity:} Time $O(n)$, Space $O(n)$.
+\begin{minted}{python}
+def containsDuplicate(nums):
+    seen = set()
+    for num in nums:
+        if num in seen:
+            return True
+        seen.add(num)
+    return False
+\end{minted}
+
+\blindsubsection{238}{product-of-array-except-self}{Product of Array Except Self}
+\textbf{Key Idea:} Two passes for prefix and suffix products without division. \textbf{Complexity:} Time $O(n)$, Space $O(1)$ extra.
+\begin{minted}{python}
+def productExceptSelf(nums):
+    res = [1] * len(nums)
+    prefix = 1
+    for i, num in enumerate(nums):
+        res[i] = prefix
+        prefix *= num
+    suffix = 1
+    for i in range(len(nums) - 1, -1, -1):
+        res[i] *= suffix
+        suffix *= nums[i]
+    return res
+\end{minted}
+
+\blindsubsection{53}{maximum-subarray}{Maximum Subarray}
+\textbf{Key Idea:} Kadane's algorithm keeps best subarray ending at current index. \textbf{Complexity:} Time $O(n)$, Space $O(1)$.
+\begin{minted}{python}
+def maxSubArray(nums):
+    best = cur = nums[0]
+    for num in nums[1:]:
+        cur = max(num, cur + num)
+        best = max(best, cur)
+    return best
+\end{minted}
+
+\blindsubsection{152}{maximum-product-subarray}{Maximum Product Subarray}
+\textbf{Key Idea:} Track both max and min products to handle negative flips. \textbf{Complexity:} Time $O(n)$, Space $O(1)$.
+\begin{minted}{python}
+def maxProduct(nums):
+    best = cur_max = cur_min = nums[0]
+    for num in nums[1:]:
+        if num < 0:
+            cur_max, cur_min = cur_min, cur_max
+        cur_max = max(num, cur_max * num)
+        cur_min = min(num, cur_min * num)
+        best = max(best, cur_max)
+    return best
+\end{minted}
+
+\blindsubsection{153}{find-minimum-in-rotated-sorted-array}{Find Minimum in Rotated Sorted Array}
+\textbf{Key Idea:} Binary search compares mid and right to locate pivot. \textbf{Complexity:} Time $O(\log n)$, Space $O(1)$.
+\begin{minted}{python}
+def findMin(nums):
+    left, right = 0, len(nums) - 1
+    while left < right:
+        mid = (left + right) // 2
+        if nums[mid] > nums[right]:
+            left = mid + 1
+        else:
+            right = mid
+    return nums[left]
+\end{minted}
+
+\blindsubsection{33}{search-in-rotated-sorted-array}{Search in Rotated Sorted Array}
+\textbf{Key Idea:} Decide which half is sorted each loop and tighten bounds. \textbf{Complexity:} Time $O(\log n)$, Space $O(1)$.
+\begin{minted}{python}
+def search(nums, target):
+    left, right = 0, len(nums) - 1
+    while left <= right:
+        mid = (left + right) // 2
+        if nums[mid] == target:
+            return mid
+        if nums[left] <= nums[mid]:
+            if nums[left] <= target < nums[mid]:
+                right = mid - 1
+            else:
+                left = mid + 1
+        else:
+            if nums[mid] < target <= nums[right]:
+                left = mid + 1
+            else:
+                right = mid - 1
+    return -1
+\end{minted}
+
+\blindsubsection{15}{3sum}{3Sum}
+\textbf{Key Idea:} Sort then sweep with two pointers, skipping duplicates. \textbf{Complexity:} Time $O(n^2)$, Space $O(1)$ plus output.
+\begin{minted}{python}
+def threeSum(nums):
+    nums.sort()
+    triplets = []
+    for i in range(len(nums) - 2):
+        if i and nums[i] == nums[i - 1]:
+            continue
+        left, right = i + 1, len(nums) - 1
+        while left < right:
+            s = nums[i] + nums[left] + nums[right]
+            if s == 0:
+                triplets.append([nums[i], nums[left], nums[right]])
+                left += 1
+                right -= 1
+                while left < right and nums[left] == nums[left - 1]:
+                    left += 1
+                while left < right and nums[right] == nums[right + 1]:
+                    right -= 1
+            elif s < 0:
+                left += 1
+            else:
+                right -= 1
+    return triplets
+\end{minted}
+
+\blindsubsection{11}{container-with-most-water}{Container With Most Water}
+\textbf{Key Idea:} Two pointers move inward, always dropping shorter wall. \textbf{Complexity:} Time $O(n)$, Space $O(1)$.
+\begin{minted}{python}
+def maxArea(height):
+    left, right = 0, len(height) - 1
+    best = 0
+    while left < right:
+        width = right - left
+        best = max(best, width * min(height[left], height[right]))
+        if height[left] < height[right]:
+            left += 1
+        else:
+            right -= 1
+    return best
+\end{minted}
+
+\coloredsection{abacus}{BinaryRed}{Binary \& Bit Manipulation Deep Dive}
+
+\blindsubsection{371}{sum-of-two-integers}{Sum of Two Integers}
+\textbf{Key Idea:} Use XOR for partial sum and AND for carry until no carry remains. \textbf{Complexity:} Time $O(1)$ with fixed-width ints, Space $O(1)$.
+\begin{minted}{python}
+def getSum(a, b):
+    mask = 0xFFFFFFFF
+    max_int = 0x7FFFFFFF
+    while b:
+        a, b = (a ^ b) & mask, ((a & b) << 1) & mask
+    return a if a <= max_int else ~(a ^ mask)
+\end{minted}
+
+\blindsubsection{191}{number-of-1-bits}{Number of 1 Bits}
+\textbf{Key Idea:} Repeatedly clear the lowest set bit with $n \mathrel{\&}= n-1$. \textbf{Complexity:} Time $O(k)$ where $k$ is number of set bits, Space $O(1)$.
+\begin{minted}{python}
+def hammingWeight(n):
+    ones = 0
+    while n:
+        n &= n - 1
+        ones += 1
+    return ones
+\end{minted}
+
+\blindsubsection{338}{counting-bits}{Counting Bits}
+\textbf{Key Idea:} Build DP using highest power of two seen so far. \textbf{Complexity:} Time $O(n)$, Space $O(n)$.
+\begin{minted}{python}
+def countBits(n):
+    bits = [0] * (n + 1)
+    offset = 1
+    for i in range(1, n + 1):
+        if offset * 2 == i:
+            offset = i
+        bits[i] = 1 + bits[i - offset]
+    return bits
+\end{minted}
+
+\blindsubsection{268}{missing-number}{Missing Number}
+\textbf{Key Idea:} XOR indices and values to cancel every present number. \textbf{Complexity:} Time $O(n)$, Space $O(1)$.
+\begin{minted}{python}
+def missingNumber(nums):
+    missing = len(nums)
+    for i, num in enumerate(nums):
+        missing ^= i ^ num
+    return missing
+\end{minted}
+
+\blindsubsection{190}{reverse-bits}{Reverse Bits}
+\textbf{Key Idea:} Shift result left each step and pull lowest bit from input. \textbf{Complexity:} Time $O(1)$ for 32 bits, Space $O(1)$.
+\begin{minted}{python}
+def reverseBits(n):
+    result = 0
+    for _ in range(32):
+        result = (result << 1) | (n & 1)
+        n >>= 1
+    return result
+\end{minted}
+
+\coloredsection{shamrock}{DPTeal}{Dynamic Programming Deep Dive}
+
+\blindsubsection{70}{climbing-stairs}{Climbing Stairs}
+\textbf{Key Idea:} Fibonacci-style recurrence using two rolling variables. \textbf{Complexity:} Time $O(n)$, Space $O(1)$.
+\begin{minted}{python}
+def climbStairs(n):
+    if n <= 2:
+        return n
+    one, two = 2, 1
+    for _ in range(3, n + 1):
+        one, two = one + two, one
+    return one
+\end{minted}
+
+\blindsubsection{322}{coin-change}{Coin Change}
+\textbf{Key Idea:} Bottom-up DP for minimum coins, initialized to sentinel large value. \textbf{Complexity:} Time $O(n \cdot \mathrm{amount})$, Space $O(\mathrm{amount})$.
+\begin{minted}{python}
+def coinChange(coins, amount):
+    dp = [amount + 1] * (amount + 1)
+    dp[0] = 0
+    for coin in coins:
+        for total in range(coin, amount + 1):
+            dp[total] = min(dp[total], 1 + dp[total - coin])
+    return dp[amount] if dp[amount] <= amount else -1
+\end{minted}
+
+\blindsubsection{300}{longest-increasing-subsequence}{Longest Increasing Subsequence}
+\textbf{Key Idea:} Patience sorting with binary search maintains best tail for each length. \textbf{Complexity:} Time $O(n \log n)$, Space $O(n)$.
+\begin{minted}{python}
+from bisect import bisect_left
+
+
+def lengthOfLIS(nums):
+    tails = []
+    for num in nums:
+        idx = bisect_left(tails, num)
+        if idx == len(tails):
+            tails.append(num)
+        else:
+            tails[idx] = num
+    return len(tails)
+\end{minted}
+
+\blindsubsection{1143}{longest-common-subsequence}{Longest Common Subsequence}
+\textbf{Key Idea:} Rolling two-row DP saves memory while comparing characters. \textbf{Complexity:} Time $O(nm)$, Space $O(m)$.
+\begin{minted}{python}
+def longestCommonSubsequence(text1, text2):
+    if len(text1) < len(text2):
+        text1, text2 = text2, text1
+    prev = [0] * (len(text2) + 1)
+    for ch1 in text1:
+        curr = [0]
+        for j, ch2 in enumerate(text2, start=1):
+            if ch1 == ch2:
+                curr.append(1 + prev[j - 1])
+            else:
+                curr.append(max(prev[j], curr[-1]))
+        prev = curr
+    return prev[-1]
+\end{minted}
+
+\blindsubsection{139}{word-break}{Word Break}
+\textbf{Key Idea:} Boolean DP on prefixes using dictionary set for quick lookup. \textbf{Complexity:} Time $O(n^2)$, Space $O(n)$.
+\begin{minted}{python}
+def wordBreak(s, wordDict):
+    words = set(wordDict)
+    dp = [False] * (len(s) + 1)
+    dp[0] = True
+    for i in range(1, len(s) + 1):
+        for j in range(i):
+            if dp[j] and s[j:i] in words:
+                dp[i] = True
+                break
+    return dp[-1]
+\end{minted}
+
+\blindsubsection{377}{combination-sum-iv}{Combination Sum IV}
+\textbf{Key Idea:} Order matters; iterate through target and sum counts. \textbf{Complexity:} Time $O(n \cdot \mathrm{target})$, Space $O(\mathrm{target})$.
+\begin{minted}{python}
+def combinationSum4(nums, target):
+    dp = [0] * (target + 1)
+    dp[0] = 1
+    for total in range(1, target + 1):
+        for num in nums:
+            if total >= num:
+                dp[total] += dp[total - num]
+    return dp[target]
+\end{minted}
+
+\blindsubsection{198}{house-robber}{House Robber}
+\textbf{Key Idea:} Track best loot with and without current house. \textbf{Complexity:} Time $O(n)$, Space $O(1)$.
+\begin{minted}{python}
+def rob(nums):
+    rob_prev, skip_prev = 0, 0
+    for value in nums:
+        rob_prev, skip_prev = skip_prev + value, max(rob_prev, skip_prev)
+    return max(rob_prev, skip_prev)
+\end{minted}
+
+\blindsubsection{213}{house-robber-ii}{House Robber II}
+\textbf{Key Idea:} Solve two linear runs excluding first or last house and take max. \textbf{Complexity:} Time $O(n)$, Space $O(1)$.
+\begin{minted}{python}
+def rob(nums):
+    if len(nums) == 1:
+        return nums[0]
+
+    def rob_line(houses):
+        rob_prev, skip_prev = 0, 0
+        for value in houses:
+            rob_prev, skip_prev = skip_prev + value, max(rob_prev, skip_prev)
+        return max(rob_prev, skip_prev)
+
+    return max(rob_line(nums[1:]), rob_line(nums[:-1]))
+\end{minted}
+
+\blindsubsection{91}{decode-ways}{Decode Ways}
+\textbf{Key Idea:} DP on index with handling for zeros and two-digit combinations. \textbf{Complexity:} Time $O(n)$, Space $O(1)$.
+\begin{minted}{python}
+def numDecodings(s):
+    if not s or s[0] == "0":
+        return 0
+    one, two = 1, 1
+    for i in range(1, len(s)):
+        cur = 0
+        if s[i] != "0":
+            cur += one
+        two_digit = int(s[i - 1 : i + 1])
+        if 10 <= two_digit <= 26:
+            cur += two
+        if cur == 0:
+            return 0
+        two, one = one, cur
+    return one
+\end{minted}
+
+\blindsubsection{62}{unique-paths}{Unique Paths}
+\textbf{Key Idea:} DP accumulation per row (or compute combinatorially). \textbf{Complexity:} Time $O(mn)$, Space $O(n)$.
+\begin{minted}{python}
+def uniquePaths(m, n):
+    row = [1] * n
+    for _ in range(1, m):
+        for j in range(1, n):
+            row[j] += row[j - 1]
+    return row[-1]
+\end{minted}
+
+\blindsubsection{55}{jump-game}{Jump Game}
+\textbf{Key Idea:} Greedy keep furthest reachable index and ensure current index is reachable. \textbf{Complexity:} Time $O(n)$, Space $O(1)$.
+\begin{minted}{python}
+def canJump(nums):
+    reach = 0
+    for i, jump in enumerate(nums):
+        if i > reach:
+            return False
+        reach = max(reach, i + jump)
+    return True
+\end{minted}
+
+\coloredsection{globe-showing-europe-africa}{GraphGreen}{Graphs \& Traversals Deep Dive}
+
+\blindsubsection{133}{clone-graph}{Clone Graph}
+\textbf{Key Idea:} DFS with hash map storing originals to clones. \textbf{Complexity:} Time $O(V + E)$, Space $O(V)$.
+\begin{minted}{python}
+class Solution:
+    def cloneGraph(self, node):
+        if not node:
+            return None
+        clones = {}
+
+        def dfs(cur):
+            if cur in clones:
+                return clones[cur]
+            copy = Node(cur.val)
+            clones[cur] = copy
+            for neighbor in cur.neighbors:
+                copy.neighbors.append(dfs(neighbor))
+            return copy
+
+        return dfs(node)
+\end{minted}
+
+\blindsubsection{207}{course-schedule}{Course Schedule}
+\textbf{Key Idea:} Kahn's algorithm counts nodes processed; detect cycle if total mismatch. \textbf{Complexity:} Time $O(V + E)$, Space $O(V + E)$.
+\begin{minted}{python}
+from collections import defaultdict, deque
+
+
+def canFinish(numCourses, prerequisites):
+    graph = defaultdict(list)
+    indegree = [0] * numCourses
+    for nxt, pre in prerequisites:
+        graph[pre].append(nxt)
+        indegree[nxt] += 1
+    queue = deque(i for i, deg in enumerate(indegree) if deg == 0)
+    visited = 0
+    while queue:
+        course = queue.popleft()
+        visited += 1
+        for nxt in graph[course]:
+            indegree[nxt] -= 1
+            if indegree[nxt] == 0:
+                queue.append(nxt)
+    return visited == numCourses
+\end{minted}
+
+\blindsubsection{417}{pacific-atlantic-water-flow}{Pacific Atlantic Water Flow}
+\textbf{Key Idea:} Reverse flood fill from both oceans and intersect reachable cells. \textbf{Complexity:} Time $O(mn)$, Space $O(mn)$.
+\begin{minted}{python}
+def pacificAtlantic(heights):
+    rows, cols = len(heights), len(heights[0])
+
+    def bfs(starts):
+        reach = set(starts)
+        queue = list(starts)
+        for r, c in queue:
+            for dr, dc in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < rows and 0 <= nc < cols:
+                    if (nr, nc) not in reach and heights[nr][nc] >= heights[r][c]:
+                        reach.add((nr, nc))
+                        queue.append((nr, nc))
+        return reach
+
+    pacific = bfs([(0, c) for c in range(cols)] + [(r, 0) for r in range(rows)])
+    atlantic = bfs([(rows - 1, c) for c in range(cols)] + [(r, cols - 1) for r in range(rows)])
+    return [[r, c] for (r, c) in pacific & atlantic]
+\end{minted}
+
+\blindsubsection{200}{number-of-islands}{Number of Islands}
+\textbf{Key Idea:} DFS flood fill to mark land as visited in-place. \textbf{Complexity:} Time $O(mn)$, Space $O(mn)$ worst case recursion.
+\begin{minted}{python}
+def numIslands(grid):
+    rows, cols = len(grid), len(grid[0])
+
+    def dfs(r, c):
+        if r < 0 or r >= rows or c < 0 or c >= cols or grid[r][c] != "1":
+            return
+        grid[r][c] = "0"
+        dfs(r + 1, c)
+        dfs(r - 1, c)
+        dfs(r, c + 1)
+        dfs(r, c - 1)
+
+    count = 0
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c] == "1":
+                count += 1
+                dfs(r, c)
+    return count
+\end{minted}
+
+\blindsubsection{261}{graph-valid-tree}{Graph Valid Tree}
+\textbf{Key Idea:} Union-find ensures no cycles and connectedness. \textbf{Complexity:} Time $O(E \alpha(V))$, Space $O(V)$.
+\begin{minted}{python}
+def validTree(n, edges):
+    if len(edges) != n - 1:
+        return False
+
+    parent = list(range(n))
+    rank = [0] * n
+
+    def find(x):
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+
+    def union(x, y):
+        root_x, root_y = find(x), find(y)
+        if root_x == root_y:
+            return False
+        if rank[root_x] < rank[root_y]:
+            parent[root_x] = root_y
+        elif rank[root_x] > rank[root_y]:
+            parent[root_y] = root_x
+        else:
+            parent[root_y] = root_x
+            rank[root_x] += 1
+        return True
+
+    return all(union(u, v) for u, v in edges)
+\end{minted}
+
+\blindsubsection{323}{number-of-connected-components-in-an-undirected-graph}{Number of Connected Components}
+\textbf{Key Idea:} DFS across adjacency lists counts components. \textbf{Complexity:} Time $O(V + E)$, Space $O(V)$.
+\begin{minted}{python}
+from collections import defaultdict
+
+
+def countComponents(n, edges):
+    graph = defaultdict(list)
+    for u, v in edges:
+        graph[u].append(v)
+        graph[v].append(u)
+
+    seen = set()
+
+    def dfs(node):
+        stack = [node]
+        while stack:
+            cur = stack.pop()
+            if cur in seen:
+                continue
+            seen.add(cur)
+            stack.extend(graph[cur])
+
+    components = 0
+    for node in range(n):
+        if node not in seen:
+            components += 1
+            dfs(node)
+    return components
+\end{minted}
+
+\blindsubsection{127}{word-ladder}{Word Ladder}
+\textbf{Key Idea:} Bidirectional BFS reduces branching using generic wildcard buckets. \textbf{Complexity:} Time $O(M^2 N)$ where $M$ is word length, Space $O(M^2 N)$.
+\begin{minted}{python}
+from collections import defaultdict, deque
+
+
+def ladderLength(beginWord, endWord, wordList):
+    if endWord not in wordList:
+        return 0
+    neighbors = defaultdict(list)
+    for word in wordList:
+        for i in range(len(word)):
+            generic = word[:i] + "*" + word[i + 1 :]
+            neighbors[generic].append(word)
+
+    begin_visit = {beginWord: 1}
+    end_visit = {endWord: 1}
+    queue_begin = deque([beginWord])
+    queue_end = deque([endWord])
+
+    def visit(queue, visit_map, other_map):
+        word = queue.popleft()
+        level = visit_map[word]
+        for i in range(len(word)):
+            generic = word[:i] + "*" + word[i + 1 :]
+            for neighbor in neighbors[generic]:
+                if neighbor in other_map:
+                    return level + other_map[neighbor]
+                if neighbor not in visit_map:
+                    visit_map[neighbor] = level + 1
+                    queue.append(neighbor)
+        return None
+
+    while queue_begin and queue_end:
+        ans = visit(queue_begin, begin_visit, end_visit)
+        if ans:
+            return ans
+        ans = visit(queue_end, end_visit, begin_visit)
+        if ans:
+            return ans
+    return 0
+\end{minted}
+
+\coloredsection{spiral-shell}{IntervalGold}{Interval Scheduling Deep Dive}
+
+\blindsubsection{57}{insert-interval}{Insert Interval}
+\textbf{Key Idea:} Merge overlaps by appending segments as you scan. \textbf{Complexity:} Time $O(n)$, Space $O(1)$ extra.
+\begin{minted}{python}
+def insert(intervals, newInterval):
+    result = []
+    i = 0
+    start, end = newInterval
+    while i < len(intervals) and intervals[i][1] < start:
+        result.append(intervals[i])
+        i += 1
+    while i < len(intervals) and intervals[i][0] <= end:
+        start = min(start, intervals[i][0])
+        end = max(end, intervals[i][1])
+        i += 1
+    result.append([start, end])
+    result.extend(intervals[i:])
+    return result
+\end{minted}
+
+\blindsubsection{56}{merge-intervals}{Merge Intervals}
+\textbf{Key Idea:} Sort by start then aggregate overlapping ranges. \textbf{Complexity:} Time $O(n \log n)$, Space $O(1)$ extra.
+\begin{minted}{python}
+def merge(intervals):
+    intervals.sort(key=lambda x: x[0])
+    merged = []
+    for interval in intervals:
+        if not merged or merged[-1][1] < interval[0]:
+            merged.append(interval[:])
+        else:
+            merged[-1][1] = max(merged[-1][1], interval[1])
+    return merged
+\end{minted}
+
+\blindsubsection{435}{non-overlapping-intervals}{Non-overlapping Intervals}
+\textbf{Key Idea:} Greedy keep earliest finishing interval and count removals. \textbf{Complexity:} Time $O(n \log n)$, Space $O(1)$.
+\begin{minted}{python}
+def eraseOverlapIntervals(intervals):
+    if not intervals:
+        return 0
+    intervals.sort(key=lambda x: x[1])
+    keep_end = intervals[0][1]
+    removals = 0
+    for start, end in intervals[1:]:
+        if start < keep_end:
+            removals += 1
+        else:
+            keep_end = end
+    return removals
+\end{minted}
+
+\blindsubsection{252}{meeting-rooms}{Meeting Rooms}
+\textbf{Key Idea:} Sort meetings and ensure each start is after prior end. \textbf{Complexity:} Time $O(n \log n)$, Space $O(1)$.
+\begin{minted}{python}
+def canAttendMeetings(intervals):
+    intervals.sort()
+    for i in range(1, len(intervals)):
+        if intervals[i][0] < intervals[i - 1][1]:
+            return False
+    return True
+\end{minted}
+
+\coloredsection{link}{LinkedRose}{Linked List Deep Dive}
+
+\blindsubsection{206}{reverse-linked-list}{Reverse Linked List}
+\textbf{Key Idea:} Iteratively flip pointers while tracking previous node. \textbf{Complexity:} Time $O(n)$, Space $O(1)$.
+\begin{minted}{python}
+def reverseList(head):
+    prev = None
+    curr = head
+    while curr:
+        nxt = curr.next
+        curr.next = prev
+        prev = curr
+        curr = nxt
+    return prev
+\end{minted}
+
+\blindsubsection{21}{merge-two-sorted-lists}{Merge Two Sorted Lists}
+\textbf{Key Idea:} Dummy sentinel simplifies tail handling during merge. \textbf{Complexity:} Time $O(n + m)$, Space $O(1)$.
+\begin{minted}{python}
+def mergeTwoLists(list1, list2):
+    dummy = tail = ListNode()
+    while list1 and list2:
+        if list1.val < list2.val:
+            tail.next, list1 = list1, list1.next
+        else:
+            tail.next, list2 = list2, list2.next
+        tail = tail.next
+    tail.next = list1 or list2
+    return dummy.next
+\end{minted}
+
+\blindsubsection{143}{reorder-list}{Reorder List}
+\textbf{Key Idea:} Split list, reverse second half, then interleave nodes. \textbf{Complexity:} Time $O(n)$, Space $O(1)$.
+\begin{minted}{python}
+def reorderList(head):
+    if not head or not head.next:
+        return
+    slow, fast = head, head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+    second = slow.next
+    slow.next = None
+
+    prev = None
+    curr = second
+    while curr:
+        nxt = curr.next
+        curr.next = prev
+        prev = curr
+        curr = nxt
+    second = prev
+
+    first = head
+    while second:
+        tmp1, tmp2 = first.next, second.next
+        first.next = second
+        second.next = tmp1
+        first, second = tmp1, tmp2
+\end{minted}
+
+\blindsubsection{19}{remove-nth-node-from-end-of-list}{Remove Nth Node From End of List}
+\textbf{Key Idea:} Two-pointer gap of $n$ nodes allows single pass removal. \textbf{Complexity:} Time $O(n)$, Space $O(1)$.
+\begin{minted}{python}
+def removeNthFromEnd(head, n):
+    dummy = ListNode(0, head)
+    fast = slow = dummy
+    for _ in range(n):
+        fast = fast.next
+    while fast.next:
+        fast = fast.next
+        slow = slow.next
+    slow.next = slow.next.next
+    return dummy.next
+\end{minted}
+
+\blindsubsection{141}{linked-list-cycle}{Linked List Cycle}
+\textbf{Key Idea:} Floyd's tortoise and hare detects cycle via pointer speeds. \textbf{Complexity:} Time $O(n)$, Space $O(1)$.
+\begin{minted}{python}
+def hasCycle(head):
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+        if slow is fast:
+            return True
+    return False
+\end{minted}
+
+\coloredsection{magic-wand}{MatrixPurple}{Matrix Manipulation Deep Dive}
+
+\blindsubsection{73}{set-matrix-zeroes}{Set Matrix Zeroes}
+\textbf{Key Idea:} Use first row/column as markers and extra flag for first column. \textbf{Complexity:} Time $O(mn)$, Space $O(1)$ extra.
+\begin{minted}{python}
+def setZeroes(matrix):
+    rows, cols = len(matrix), len(matrix[0])
+    first_col_zero = any(matrix[r][0] == 0 for r in range(rows))
+    first_row_zero = any(matrix[0][c] == 0 for c in range(cols))
+
+    for r in range(1, rows):
+        for c in range(1, cols):
+            if matrix[r][c] == 0:
+                matrix[r][0] = matrix[0][c] = 0
+
+    for r in range(1, rows):
+        for c in range(1, cols):
+            if matrix[r][0] == 0 or matrix[0][c] == 0:
+                matrix[r][c] = 0
+
+    if first_row_zero:
+        for c in range(cols):
+            matrix[0][c] = 0
+    if first_col_zero:
+        for r in range(rows):
+            matrix[r][0] = 0
+\end{minted}
+
+\blindsubsection{54}{spiral-matrix}{Spiral Matrix}
+\textbf{Key Idea:} Traverse using shrinking boundaries while collecting elements. \textbf{Complexity:} Time $O(mn)$, Space $O(1)$ extra.
+\begin{minted}{python}
+def spiralOrder(matrix):
+    result = []
+    top, bottom = 0, len(matrix) - 1
+    left, right = 0, len(matrix[0]) - 1
+    while top <= bottom and left <= right:
+        for c in range(left, right + 1):
+            result.append(matrix[top][c])
+        top += 1
+        for r in range(top, bottom + 1):
+            result.append(matrix[r][right])
+        right -= 1
+        if top <= bottom:
+            for c in range(right, left - 1, -1):
+                result.append(matrix[bottom][c])
+            bottom -= 1
+        if left <= right:
+            for r in range(bottom, top - 1, -1):
+                result.append(matrix[r][left])
+            left += 1
+    return result
+\end{minted}
+
+\blindsubsection{48}{rotate-image}{Rotate Image}
+\textbf{Key Idea:} Transpose then reverse each row in-place. \textbf{Complexity:} Time $O(n^2)$, Space $O(1)$.
+\begin{minted}{python}
+def rotate(matrix):
+    n = len(matrix)
+    for r in range(n):
+        for c in range(r, n):
+            matrix[r][c], matrix[c][r] = matrix[c][r], matrix[r][c]
+    for row in matrix:
+        row.reverse()
+\end{minted}
+
+\blindsubsection{79}{word-search}{Word Search}
+\textbf{Key Idea:} Backtrack with visited marking per DFS path. \textbf{Complexity:} Time $O(mn \cdot 4^L)$, Space $O(L)$.
+\begin{minted}{python}
+def exist(board, word):
+    rows, cols = len(board), len(board[0])
+
+    def dfs(r, c, idx):
+        if idx == len(word):
+            return True
+        if r < 0 or r >= rows or c < 0 or c >= cols:
+            return False
+        if board[r][c] != word[idx]:
+            return False
+        temp, board[r][c] = board[r][c], "#"
+        found = (
+            dfs(r + 1, c, idx + 1)
+            or dfs(r - 1, c, idx + 1)
+            or dfs(r, c + 1, idx + 1)
+            or dfs(r, c - 1, idx + 1)
+        )
+        board[r][c] = temp
+        return found
+
+    for r in range(rows):
+        for c in range(cols):
+            if dfs(r, c, 0):
+                return True
+    return False
+\end{minted}
+
+\coloredsection{books}{StringOrange}{String Patterns Deep Dive}
+
+\blindsubsection{3}{longest-substring-without-repeating-characters}{Longest Substring Without Repeating Characters}
+\textbf{Key Idea:} Sliding window with index map to skip duplicates. \textbf{Complexity:} Time $O(n)$, Space $O(k)$.
+\begin{minted}{python}
+def lengthOfLongestSubstring(s):
+    seen = {}
+    left = best = 0
+    for right, ch in enumerate(s):
+        if ch in seen and seen[ch] >= left:
+            left = seen[ch] + 1
+        seen[ch] = right
+        best = max(best, right - left + 1)
+    return best
+\end{minted}
+
+\blindsubsection{424}{longest-repeating-character-replacement}{Longest Repeating Character Replacement}
+\textbf{Key Idea:} Expand window, shrink when replacements exceed $k$ using max count. \textbf{Complexity:} Time $O(n)$, Space $O(1)$.
+\begin{minted}{python}
+from collections import Counter
+
+
+def characterReplacement(s, k):
+    counts = Counter()
+    left = best = 0
+    max_freq = 0
+    for right, ch in enumerate(s):
+        counts[ch] += 1
+        max_freq = max(max_freq, counts[ch])
+        while (right - left + 1) - max_freq > k:
+            counts[s[left]] -= 1
+            left += 1
+        best = max(best, right - left + 1)
+    return best
+\end{minted}
+
+\blindsubsection{76}{minimum-window-substring}{Minimum Window Substring}
+\textbf{Key Idea:} Maintain window counts, contract when window satisfies requirement. \textbf{Complexity:} Time $O(n)$, Space $O(1)$ for ASCII.
+\begin{minted}{python}
+from collections import Counter
+
+
+def minWindow(s, t):
+    need = Counter(t)
+    missing = len(t)
+    left = start = end = 0
+    for right, ch in enumerate(s, start=1):
+        missing -= need[ch] > 0
+        need[ch] -= 1
+        if missing == 0:
+            while left < right and need[s[left]] < 0:
+                need[s[left]] += 1
+                left += 1
+            if not end or right - left < end - start:
+                start, end = left, right
+            need[s[left]] += 1
+            missing += 1
+            left += 1
+    return s[start:end]
+\end{minted}
+
+\blindsubsection{242}{valid-anagram}{Valid Anagram}
+\textbf{Key Idea:} Frequency counts must match for all letters. \textbf{Complexity:} Time $O(n)$, Space $O(1)$ for 26 letters.
+\begin{minted}{python}
+from collections import Counter
+
+
+def isAnagram(s, t):
+    return Counter(s) == Counter(t)
+\end{minted}
+
+\blindsubsection{49}{group-anagrams}{Group Anagrams}
+\textbf{Key Idea:} Sort letters or count signature to bucket words. \textbf{Complexity:} Time $O(n k \log k)$ with sort, Space $O(nk)$.
+\begin{minted}{python}
+from collections import defaultdict
+
+
+def groupAnagrams(strs):
+    groups = defaultdict(list)
+    for word in strs:
+        key = "".join(sorted(word))
+        groups[key].append(word)
+    return list(groups.values())
+\end{minted}
+
+\blindsubsection{20}{valid-parentheses}{Valid Parentheses}
+\textbf{Key Idea:} Stack ensures matching bracket types and order. \textbf{Complexity:} Time $O(n)$, Space $O(n)$.
+\begin{minted}{python}
+def isValid(s):
+    pairs = {")": "(", "]": "[", "}": "{"}
+    stack = []
+    for ch in s:
+        if ch in pairs.values():
+            stack.append(ch)
+        else:
+            if not stack or stack.pop() != pairs[ch]:
+                return False
+    return not stack
+\end{minted}
+
+\blindsubsection{125}{valid-palindrome}{Valid Palindrome}
+\textbf{Key Idea:} Two pointers skipping non-alphanumeric characters. \textbf{Complexity:} Time $O(n)$, Space $O(1)$.
+\begin{minted}{python}
+def isPalindrome(s):
+    left, right = 0, len(s) - 1
+    while left < right:
+        while left < right and not s[left].isalnum():
+            left += 1
+        while left < right and not s[right].isalnum():
+            right -= 1
+        if s[left].lower() != s[right].lower():
+            return False
+        left += 1
+        right -= 1
+    return True
+\end{minted}
+
+\blindsubsection{5}{longest-palindromic-substring}{Longest Palindromic Substring}
+\textbf{Key Idea:} Expand around every center and record best span. \textbf{Complexity:} Time $O(n^2)$, Space $O(1)$.
+\begin{minted}{python}
+def longestPalindrome(s):
+    best = (0, 1)
+
+    def expand(left, right):
+        while left >= 0 and right < len(s) and s[left] == s[right]:
+            left -= 1
+            right += 1
+        return left + 1, right
+
+    for i in range(len(s)):
+        best = max(best, expand(i, i), expand(i, i + 1), key=lambda x: x[1] - x[0])
+    return s[best[0] : best[1]]
+\end{minted}
+
+\blindsubsection{647}{palindromic-substrings}{Palindromic Substrings}
+\textbf{Key Idea:} Expand from each center counting palindromes. \textbf{Complexity:} Time $O(n^2)$, Space $O(1)$.
+\begin{minted}{python}
+def countSubstrings(s):
+    def expand(left, right):
+        total = 0
+        while left >= 0 and right < len(s) and s[left] == s[right]:
+            total += 1
+            left -= 1
+            right += 1
+        return total
+
+    count = 0
+    for i in range(len(s)):
+        count += expand(i, i)
+        count += expand(i, i + 1)
+    return count
+\end{minted}
+
+\blindsubsection{271}{encode-and-decode-strings}{Encode and Decode Strings}
+\textbf{Key Idea:} Length-prefix avoids delimiter collisions. \textbf{Complexity:} Time $O(n)$, Space $O(n)$.
+\begin{minted}{python}
+class Codec:
+    def encode(self, strs):
+        return "".join(f"{len(s)}#{s}" for s in strs)
+
+    def decode(self, s):
+        result = []
+        i = 0
+        while i < len(s):
+            j = s.find("#", i)
+            length = int(s[i:j])
+            j += 1
+            result.append(s[j : j + length])
+            i = j + length
+        return result
+\end{minted}
+
+\coloredsection{deciduous-tree}{TreeOlive}{Binary Tree Toolkit Deep Dive}
+
+\blindsubsection{104}{maximum-depth-of-binary-tree}{Maximum Depth of Binary Tree}
+\textbf{Key Idea:} DFS returns depth as 1 + max child depth. \textbf{Complexity:} Time $O(n)$, Space $O(h)$ recursion.
+\begin{minted}{python}
+def maxDepth(root):
+    if not root:
+        return 0
+    return 1 + max(maxDepth(root.left), maxDepth(root.right))
+\end{minted}
+
+\blindsubsection{100}{same-tree}{Same Tree}
+\textbf{Key Idea:} Recursively compare structure and values. \textbf{Complexity:} Time $O(n)$, Space $O(h)$.
+\begin{minted}{python}
+def isSameTree(p, q):
+    if not p and not q:
+        return True
+    if not p or not q or p.val != q.val:
+        return False
+    return isSameTree(p.left, q.left) and isSameTree(p.right, q.right)
+\end{minted}
+
+\blindsubsection{226}{invert-binary-tree}{Invert Binary Tree}
+\textbf{Key Idea:} Swap children recursively or iteratively. \textbf{Complexity:} Time $O(n)$, Space $O(h)$.
+\begin{minted}{python}
+def invertTree(root):
+    if not root:
+        return None
+    root.left, root.right = invertTree(root.right), invertTree(root.left)
+    return root
+\end{minted}
+
+\blindsubsection{102}{binary-tree-level-order-traversal}{Binary Tree Level Order Traversal}
+\textbf{Key Idea:} BFS queue collects nodes level by level. \textbf{Complexity:} Time $O(n)$, Space $O(n)$.
+\begin{minted}{python}
+from collections import deque
+
+
+def levelOrder(root):
+    if not root:
+        return []
+    queue = deque([root])
+    levels = []
+    while queue:
+        level_size = len(queue)
+        level = []
+        for _ in range(level_size):
+            node = queue.popleft()
+            level.append(node.val)
+            if node.left:
+                queue.append(node.left)
+            if node.right:
+                queue.append(node.right)
+        levels.append(level)
+    return levels
+\end{minted}
+
+\blindsubsection{572}{subtree-of-another-tree}{Subtree of Another Tree}
+\textbf{Key Idea:} Check equality at each node; bail early if subtree matches. \textbf{Complexity:} Time $O(nm)$ worst, Space $O(h)$.
+\begin{minted}{python}
+def isSubtree(root, subRoot):
+    if not subRoot:
+        return True
+    if not root:
+        return False
+
+    def same(a, b):
+        if not a and not b:
+            return True
+        if not a or not b or a.val != b.val:
+            return False
+        return same(a.left, b.left) and same(a.right, b.right)
+
+    if same(root, subRoot):
+        return True
+    return isSubtree(root.left, subRoot) or isSubtree(root.right, subRoot)
+\end{minted}
+
+\blindsubsection{105}{construct-binary-tree-from-preorder-and-inorder-traversal}{Construct Binary Tree from Preorder and Inorder Traversal}
+\textbf{Key Idea:} Preorder gives root; use inorder index map to split subtrees. \textbf{Complexity:} Time $O(n)$, Space $O(n)$.
+\begin{minted}{python}
+def buildTree(preorder, inorder):
+    index = {value: i for i, value in enumerate(inorder)}
+
+    def helper(pre_left, pre_right, in_left):
+        if pre_left > pre_right:
+            return None
+        root_val = preorder[pre_left]
+        root = TreeNode(root_val)
+        in_root = index[root_val]
+        left_size = in_root - in_left
+        root.left = helper(pre_left + 1, pre_left + left_size, in_left)
+        root.right = helper(pre_left + left_size + 1, pre_right, in_root + 1)
+        return root
+
+    return helper(0, len(preorder) - 1, 0)
+\end{minted}
+
+\blindsubsection{98}{validate-binary-search-tree}{Validate Binary Search Tree}
+\textbf{Key Idea:} Maintain valid min/max bounds per node. \textbf{Complexity:} Time $O(n)$, Space $O(h)$.
+\begin{minted}{python}
+def isValidBST(root):
+    def validate(node, low, high):
+        if not node:
+            return True
+        if not (low < node.val < high):
+            return False
+        return validate(node.left, low, node.val) and validate(node.right, node.val, high)
+
+    return validate(root, float("-inf"), float("inf"))
+\end{minted}
+
+\blindsubsection{230}{kth-smallest-element-in-a-bst}{Kth Smallest Element in a BST}
+\textbf{Key Idea:} Inorder traversal yields increasing order; stop at $k$. \textbf{Complexity:} Time $O(k)$, Space $O(h)$.
+\begin{minted}{python}
+def kthSmallest(root, k):
+    stack = []
+    while True:
+        while root:
+            stack.append(root)
+            root = root.left
+        node = stack.pop()
+        k -= 1
+        if k == 0:
+            return node.val
+        root = node.right
+\end{minted}
+
+\blindsubsection{235}{lowest-common-ancestor-of-a-binary-search-tree}{Lowest Common Ancestor of a BST}
+\textbf{Key Idea:} Use BST ordering to move toward divergence point. \textbf{Complexity:} Time $O(h)$, Space $O(1)$.
+\begin{minted}{python}
+def lowestCommonAncestor(root, p, q):
+    while root:
+        if p.val < root.val and q.val < root.val:
+            root = root.left
+        elif p.val > root.val and q.val > root.val:
+            root = root.right
+        else:
+            return root
+\end{minted}
+
+\blindsubsection{124}{binary-tree-maximum-path-sum}{Binary Tree Maximum Path Sum}
+\textbf{Key Idea:} Postorder computes max gain from each node while updating global best. \textbf{Complexity:} Time $O(n)$, Space $O(h)$.
+\begin{minted}{python}
+def maxPathSum(root):
+    best = float("-inf")
+
+    def gain(node):
+        nonlocal best
+        if not node:
+            return 0
+        left = max(gain(node.left), 0)
+        right = max(gain(node.right), 0)
+        best = max(best, node.val + left + right)
+        return node.val + max(left, right)
+
+    gain(root)
+    return best
+\end{minted}
+
+\blindsubsection{297}{serialize-and-deserialize-binary-tree}{Serialize and Deserialize Binary Tree}
+\textbf{Key Idea:} Preorder traversal with sentinel markers for null nodes. \textbf{Complexity:} Time $O(n)$, Space $O(n)$.
+\begin{minted}{python}
+class Codec:
+    def serialize(self, root):
+        values = []
+
+        def dfs(node):
+            if not node:
+                values.append("#")
+                return
+            values.append(str(node.val))
+            dfs(node.left)
+            dfs(node.right)
+
+        dfs(root)
+        return " ".join(values)
+
+    def deserialize(self, data):
+        values = iter(data.split())
+
+        def dfs():
+            val = next(values)
+            if val == "#":
+                return None
+            node = TreeNode(int(val))
+            node.left = dfs()
+            node.right = dfs()
+            return node
+
+        return dfs()
+\end{minted}
+
+\coloredsection{gem-stone}{HeapCyan}{Heaps \& Priority Queues Deep Dive}
+
+\blindsubsection{23}{merge-k-sorted-lists}{Merge k Sorted Lists}
+\textbf{Key Idea:} Push the head of each list into a min-heap and stream smallest nodes. \textbf{Complexity:} Time $O(n \log k)$, Space $O(k)$.
+\begin{minted}{python}
+import heapq
+
+
+def mergeKLists(lists):
+    heap = []
+    for i, node in enumerate(lists):
+        if node:
+            heapq.heappush(heap, (node.val, i, node))
+
+    dummy = tail = ListNode()
+    while heap:
+        _, i, node = heapq.heappop(heap)
+        tail.next = node
+        tail = tail.next
+        if node.next:
+            heapq.heappush(heap, (node.next.val, i, node.next))
+    return dummy.next
+\end{minted}
+
+\blindsubsection{347}{top-k-frequent-elements}{Top K Frequent Elements}
+\textbf{Key Idea:} Use bucket sort or heap; here we use bucket array for linear time. \textbf{Complexity:} Time $O(n)$, Space $O(n)$.
+\begin{minted}{python}
+from collections import Counter
+
+
+def topKFrequent(nums, k):
+    freq = Counter(nums)
+    buckets = [[] for _ in range(len(nums) + 1)]
+    for num, count in freq.items():
+        buckets[count].append(num)
+    result = []
+    for count in range(len(buckets) - 1, -1, -1):
+        for num in buckets[count]:
+            result.append(num)
+            if len(result) == k:
+                return result
+\end{minted}
+
+\blindsubsection{295}{find-median-from-data-stream}{Find Median from Data Stream}
+\textbf{Key Idea:} Two heaps maintain lower and upper halves balanced by size. \textbf{Complexity:} Time $O(\log n)$ per insert, Space $O(n)$.
+\begin{minted}{python}
+import heapq
+
+
+class MedianFinder:
+    def __init__(self):
+        self.low = []   # max-heap via negated values
+        self.high = []  # min-heap
+
+    def addNum(self, num):
+        heapq.heappush(self.low, -num)
+        heapq.heappush(self.high, -heapq.heappop(self.low))
+        if len(self.high) > len(self.low):
+            heapq.heappush(self.low, -heapq.heappop(self.high))
+
+    def findMedian(self):
+        if len(self.low) > len(self.high):
+            return -self.low[0]
+        return (-self.low[0] + self.high[0]) / 2
+\end{minted}
+
+\coloredsection{performing-arts}{BacktrackPlum}{Backtracking Patterns Deep Dive}
+
+\blindsubsection{78}{subsets}{Subsets}
+\textbf{Key Idea:} DFS explores include/exclude choices building powerset. \textbf{Complexity:} Time $O(n 2^n)$, Space $O(n)$.
+\begin{minted}{python}
+def subsets(nums):
+    result = []
+    subset = []
+
+    def dfs(index):
+        if index == len(nums):
+            result.append(subset[:])
+            return
+        subset.append(nums[index])
+        dfs(index + 1)
+        subset.pop()
+        dfs(index + 1)
+
+    dfs(0)
+    return result
+\end{minted}
+
+\blindsubsection{39}{combination-sum}{Combination Sum}
+\textbf{Key Idea:} Backtrack with current sum and allow reuse of the same candidate. \textbf{Complexity:} Time exponential, Space $O(target / \min(nums))$ recursion.
+\begin{minted}{python}
+def combinationSum(candidates, target):
+    result = []
+    path = []
+
+    def dfs(index, remaining):
+        if remaining == 0:
+            result.append(path[:])
+            return
+        if remaining < 0 or index == len(candidates):
+            return
+        path.append(candidates[index])
+        dfs(index, remaining - candidates[index])
+        path.pop()
+        dfs(index + 1, remaining)
+
+    dfs(0, target)
+    return result
+\end{minted}
+
+\blindsubsection{46}{permutations}{Permutations}
+\textbf{Key Idea:} Swap in-place to build permutations without extra visited set. \textbf{Complexity:} Time $O(n \cdot n!)$, Space $O(n)$ recursion.
+\begin{minted}{python}
+def permute(nums):
+    result = []
+
+    def dfs(start):
+        if start == len(nums):
+            result.append(nums[:])
+            return
+        for i in range(start, len(nums)):
+            nums[start], nums[i] = nums[i], nums[start]
+            dfs(start + 1)
+            nums[start], nums[i] = nums[i], nums[start]
+
+    dfs(0)
+    return result
+\end{minted}
+
+\blindsubsection{131}{palindrome-partitioning}{Palindrome Partitioning}
+\textbf{Key Idea:} Backtrack on prefixes while pruning non-palindromes. \textbf{Complexity:} Time exponential, Space $O(n)$ recursion plus output.
+\begin{minted}{python}
+def partition(s):
+    result = []
+    path = []
+
+    def dfs(start):
+        if start == len(s):
+            result.append(path[:])
+            return
+        for end in range(start + 1, len(s) + 1):
+            if s[start:end] == s[start:end][::-1]:
+                path.append(s[start:end])
+                dfs(end)
+                path.pop()
+
+    dfs(0)
+    return result
+\end{minted}
+
+\blindsubsection{17}{letter-combinations-of-a-phone-number}{Letter Combinations of a Phone Number}
+\textbf{Key Idea:} Map digits to letters and build strings recursively. \textbf{Complexity:} Time $O(4^n)$, Space $O(n)$.
+\begin{minted}{python}
+def letterCombinations(digits):
+    if not digits:
+        return []
+    mapping = {
+        "2": "abc",
+        "3": "def",
+        "4": "ghi",
+        "5": "jkl",
+        "6": "mno",
+        "7": "pqrs",
+        "8": "tuv",
+        "9": "wxyz",
+    }
+    result = []
+
+    def dfs(index, path):
+        if index == len(digits):
+            result.append("".join(path))
+            return
+        for ch in mapping[digits[index]]:
+            path.append(ch)
+            dfs(index + 1, path)
+            path.pop()
+
+    dfs(0, [])
+    return result
+\end{minted}
+
+\end{document}
